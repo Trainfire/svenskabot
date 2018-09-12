@@ -7,11 +7,6 @@ using DSharpPlus.CommandsNext;
 
 namespace svenskabot
 {
-    class Config
-    {
-        public string Token { get; set; }
-    }
-
     class Program
     {
         static DiscordClient discord;
