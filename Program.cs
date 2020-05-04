@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using System.IO;
-using Newtonsoft.Json;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 
