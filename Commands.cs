@@ -25,7 +25,7 @@ namespace svenskabot
             if (entry != null)
             {
                 outBuilder = new DiscordEmbedBuilderFromOrdEntry(entry).EmbedBuilder;
-                outBuilder.AddField("Source", "SO");
+                outBuilder.AddField("Källa", "SO");
             }
             else
             {

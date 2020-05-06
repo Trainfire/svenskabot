@@ -52,7 +52,7 @@ namespace svenskabot
                 var definitionEntry = ordEntry.Definitioner[i];
 
                 EmbedBuilder.AddField($"Definition { (i + 1).ToString() }", definitionEntry.Definition);
-                EmbedBuilder.AddField("Exemplar", string.Join("\n", definitionEntry.Exemplar));
+                EmbedBuilder.AddField("Exempel", string.Join("\n", definitionEntry.Exemplar));
             }
         }
     }
