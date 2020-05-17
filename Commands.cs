@@ -38,7 +38,7 @@ namespace svenskabot
                 var url = $"https://svenska.se/tre/?sok={ entry.Grundform }&pz=1";
                 url = url.Replace(" ", "+");
 
-                outBuilder.AddField("Källa", $"SO ({ url })");
+                outBuilder.AddField("Källa", $"SO - { url }");
             }
             else
             {

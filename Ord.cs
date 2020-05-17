@@ -70,7 +70,7 @@ namespace svenskabot
                 }
 
                 // Make one string with line breaks since it takes less room than a header for each example.
-                if (examples != null)
+                if (examples != null && examples.Count() != 0)
                 {
                     var newLine = "\n- ";
                     definitionString += newLine;
