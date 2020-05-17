@@ -47,14 +47,14 @@ namespace svenskabot
                 var definitionNode = lexemNode.SelectSingleNode($"./*[@class='def']");
                 var definitionTNode = lexemNode.SelectSingleNode($"./*[@class='deft']");
 
-                var exemplar = new List<string>();
+                var exempel = new List<string>();
 
                 lexemNode
                     .SelectNodes(".//*[@class='syntex']")
                     .ToList()
-                    .ForEach(x => exemplar.Add(x.InnerText));
+                    .ForEach(x => exempel.Add(x.InnerText));
 
-                definitions.Add(new OrdDefinition(definitionNode.InnerText, definitionTNode != null ? definitionTNode.InnerText : "", exemplar));
+                definitions.Add(new OrdDefinition(definitionNode.InnerText, definitionTNode != null ? definitionTNode.InnerText : "", exempel));
             }
 
             string localParseClass(string className)

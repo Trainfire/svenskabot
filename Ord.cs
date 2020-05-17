@@ -1,5 +1,6 @@
 ﻿using DSharpPlus.Entities;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 
 namespace svenskabot
@@ -26,15 +27,15 @@ namespace svenskabot
     {
         public string Definition { get; private set; }
         public string DefinitionT { get; private set; }
-        public IReadOnlyList<string> Exemplar { get { return _exemplar; } }
+        public IReadOnlyList<string> Exempel { get { return _exempel; } }
 
-        private List<string> _exemplar { get; set; } = new List<string>();
+        private List<string> _exempel { get; set; } = new List<string>();
 
-        public OrdDefinition(string definition, string definitionT, List<string> exemplar)
+        public OrdDefinition(string definition, string definitionT, List<string> exempel)
         {
             Definition = definition;
             DefinitionT = definitionT;
-            _exemplar = exemplar;
+            _exempel = exempel;
         }
     }
 
@@ -57,21 +58,26 @@ namespace svenskabot
                 if (definitionEntry.DefinitionT != string.Empty)
                     definitionString += $" ({ definitionEntry.DefinitionT })";
 
-                EmbedBuilder.AddField($"Definition { (i + 1).ToString() }", definitionString);
-
-                IEnumerable<string> exemplar = null;
+                IEnumerable<string> examples = null;
 
                 if (maxExamples > 0)
                 {
-                    exemplar = definitionEntry.Exemplar.Take(maxExamples);
+                    examples = definitionEntry.Exempel.Take(maxExamples);
                 }
                 else if (maxExamples == -1)
                 {
-                    exemplar = definitionEntry.Exemplar;
+                    examples = definitionEntry.Exempel;
                 }
 
-                if (exemplar != null)
-                    EmbedBuilder.AddField("Exempel", string.Join("\n", exemplar), true);
+                // Make one string with line breaks since it takes less room than a header for each example.
+                if (examples != null)
+                {
+                    var newLine = "\n- ";
+                    definitionString += newLine;
+                    definitionString += string.Join(newLine, examples);
+                }
+
+                EmbedBuilder.AddField($"Definition { (i + 1).ToString() }", definitionString);
             }
         }
     }

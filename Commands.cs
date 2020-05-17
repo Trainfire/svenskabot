@@ -3,6 +3,7 @@ using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace svenskabot
 {
@@ -33,7 +34,11 @@ namespace svenskabot
             if (entry != null)
             {
                 outBuilder = new DiscordEmbedBuilderFromOrdEntry(entry, 1).EmbedBuilder;
-                outBuilder.AddField("Källa", "SO");
+
+                var url = $"https://svenska.se/tre/?sok={ entry.Grundform }&pz=1";
+                url = url.Replace(" ", "+");
+
+                outBuilder.AddField("Källa", $"SO ({ url })");
             }
             else
             {
