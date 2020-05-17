@@ -1,5 +1,7 @@
 ﻿using HtmlAgilityPack;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -42,7 +44,8 @@ namespace svenskabot
 
             foreach (var lexemNode in lexemNodes)
             {
-                var definition = lexemNode.SelectSingleNode("./*[@class='def']").InnerText;
+                var definitionNode = lexemNode.SelectSingleNode($"./*[@class='def']");
+                var definitionTNode = lexemNode.SelectSingleNode($"./*[@class='deft']");
 
                 var exemplar = new List<string>();
 
@@ -51,7 +54,7 @@ namespace svenskabot
                     .ToList()
                     .ForEach(x => exemplar.Add(x.InnerText));
 
-                definitions.Add(new OrdDefinition(definition, exemplar));
+                definitions.Add(new OrdDefinition(definitionNode.InnerText, definitionTNode != null ? definitionTNode.InnerText : "", exemplar));
             }
 
             string localParseClass(string className)

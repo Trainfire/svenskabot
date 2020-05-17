@@ -1,4 +1,5 @@
-﻿using DSharpPlus.CommandsNext;
+﻿using DSharpPlus;
+using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using System.Threading.Tasks;
@@ -7,16 +8,23 @@ namespace svenskabot
 {
     public class Commands
     {
-        [Command("define")]
-        public async Task Define(CommandContext ctx) => await SearchSO(ctx);
+        [Command("source"), Description("Returns the GitHub project page.")]
+        public async Task GetProjectSource(CommandContext ctx)
+        {
+            var builder = new DiscordEmbedBuilder();
+            builder.AddField("Source", "https://github.com/Trainfire/svenskabot");
 
-        [Command("definera")]
-        public async Task Definera(CommandContext ctx) => await SearchSO(ctx);
+            await ctx.RespondAsync(embed: builder);
+        }
 
-        private async Task SearchSO(CommandContext ctx)
+        [Command("define"), Description("Searches SO for the specified word."), Aliases("definera")]
+        public async Task SearchSO(CommandContext ctx)
         {
             string searchTerm = ctx.RawArgumentString;
             searchTerm = searchTerm.TrimStart();
+
+            // Show typing response whilst searching.
+            await ctx.TriggerTypingAsync();
 
             var searcher = new SOSearcher(searchTerm);
             var entry = await searcher.GetOrdEntry();
@@ -24,7 +32,7 @@ namespace svenskabot
             DiscordEmbedBuilder outBuilder;
             if (entry != null)
             {
-                outBuilder = new DiscordEmbedBuilderFromOrdEntry(entry).EmbedBuilder;
+                outBuilder = new DiscordEmbedBuilderFromOrdEntry(entry, 1).EmbedBuilder;
                 outBuilder.AddField("Källa", "SO");
             }
             else

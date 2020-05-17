@@ -25,13 +25,15 @@ namespace svenskabot
     class OrdDefinition
     {
         public string Definition { get; private set; }
+        public string DefinitionT { get; private set; }
         public IReadOnlyList<string> Exemplar { get { return _exemplar; } }
 
         private List<string> _exemplar { get; set; } = new List<string>();
 
-        public OrdDefinition(string definition, List<string> exemplar)
+        public OrdDefinition(string definition, string definitionT, List<string> exemplar)
         {
             Definition = definition;
+            DefinitionT = definitionT;
             _exemplar = exemplar;
         }
     }
@@ -40,7 +42,7 @@ namespace svenskabot
     {
         public DiscordEmbedBuilder EmbedBuilder { get; private set; } = new DiscordEmbedBuilder();
 
-        public DiscordEmbedBuilderFromOrdEntry(OrdEntry ordEntry)
+        public DiscordEmbedBuilderFromOrdEntry(OrdEntry ordEntry, int maxExamples = -1)
         {
             EmbedBuilder.AddField("Grundform", ordEntry.Grundform);
 
@@ -51,8 +53,25 @@ namespace svenskabot
             {
                 var definitionEntry = ordEntry.Definitioner[i];
 
-                EmbedBuilder.AddField($"Definition { (i + 1).ToString() }", definitionEntry.Definition);
-                EmbedBuilder.AddField("Exempel", string.Join("\n", definitionEntry.Exemplar));
+                var definitionString = definitionEntry.Definition;
+                if (definitionEntry.DefinitionT != string.Empty)
+                    definitionString += $" ({ definitionEntry.DefinitionT })";
+
+                EmbedBuilder.AddField($"Definition { (i + 1).ToString() }", definitionString);
+
+                IEnumerable<string> exemplar = null;
+
+                if (maxExamples > 0)
+                {
+                    exemplar = definitionEntry.Exemplar.Take(maxExamples);
+                }
+                else if (maxExamples == -1)
+                {
+                    exemplar = definitionEntry.Exemplar;
+                }
+
+                if (exemplar != null)
+                    EmbedBuilder.AddField("Exempel", string.Join("\n", exemplar), true);
             }
         }
     }
