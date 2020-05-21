@@ -48,5 +48,21 @@ namespace svenskabot
 
             await ctx.RespondAsync(embed: outBuilder);
         }
+
+        [Command("examples"), Description("Searches exempelmeningar.se for the specified word."), Aliases("exempel")]
+        public async Task SearchExempelMeningar(CommandContext ctx)
+        {
+            string searchTerm = ctx.RawArgumentString;
+            searchTerm = searchTerm.TrimStart();
+
+            // Show typing response whilst searching.
+            await ctx.TriggerTypingAsync();
+
+            var searcher = new ExempelMeningarSearcher(searchTerm);
+            var result = await searcher.GetExamples();
+            var embedBuilder = new DiscordEmbedBuilderFromExampelMeningarSearcher(result, 5);
+
+            await ctx.RespondAsync(embed: embedBuilder.EmbedBuilder);
+        }
     }
 }
