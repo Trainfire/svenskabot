@@ -2,6 +2,7 @@
 using HtmlAgilityPack;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace svenskabot
@@ -55,17 +56,26 @@ namespace svenskabot
             {
                 var firstTab = tabContentNodes.First();
 
-                var sourceText = string.Join("", firstTab.InnerText.Split("<hr>"));
+                var sourceTextArr = string.Join("", firstTab.InnerText.Split("<hr>"))
+                    .Replace("\n", "")
+                    .Trim()
+                    .Split(".");
 
-                // Remove line break spam.
-                sourceText = sourceText.Replace("\n", "");
-
-                var textArr = sourceText.Split(".");
-
-                foreach (var text in textArr)
+                for (int i = 0; i < sourceTextArr.Length; i++)
                 {
+                    var text = sourceTextArr[i];
                     if (text != string.Empty)
+                    {
+                        // Make search term bold.
+                        var regex = new Regex(SearchTerm, RegexOptions.IgnoreCase);
+                        var match = regex.Match(text);
+                        text = text.Replace(match.Value, $"***{ match.Value }***");
+
+                        //  Make ordinal.
+                        text = $"{ i + 1 }. { text }.";
+
                         examples.Add(text);
+                    }
                 }
             }
 
