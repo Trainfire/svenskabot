@@ -1,10 +1,12 @@
 ﻿using DSharpPlus.Entities;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 
 namespace svenskabot
 {
+    /// <summary>
+    /// Generic classes since we might want to use them for other dictionary searches.
+    /// </summary>
     class OrdEntry
     {
         public string Grundform { get; private set; }
@@ -21,6 +23,43 @@ namespace svenskabot
             Böjningar = böjningar;
             _definitioner = definitioner;
         }
+
+        public DiscordEmbedBuilder AsEmbed()
+        {
+            var outBuilder = new DiscordEmbedBuilder();
+
+            outBuilder.AddField("Grundform", Grundform);
+
+            if (Böjningar != "")
+                outBuilder.AddField("Böjningar", Böjningar);
+
+            for (int i = 0; i < Definitioner.Count(); i++)
+            {
+                var definitionEntry = Definitioner[i];
+
+                var definitionString = definitionEntry.Definition;
+                if (definitionEntry.DefinitionT != string.Empty)
+                    definitionString += $" ({ definitionEntry.DefinitionT })";
+
+                IEnumerable<string> examples = null;
+
+                const int maxExamples = 5;
+
+                examples = definitionEntry.Exempel.Take(maxExamples);
+
+                // Make one string with line breaks since it takes less room than a header for each example.
+                if (examples != null && examples.Count() != 0)
+                {
+                    var newLine = "\n- ";
+                    definitionString += newLine;
+                    definitionString += string.Join(newLine, examples);
+                }
+
+                outBuilder.AddField($"Definition { (i + 1).ToString() }", definitionString);
+            }
+
+            return outBuilder;
+        }
     }
 
     class OrdDefinition
@@ -36,49 +75,6 @@ namespace svenskabot
             Definition = definition;
             DefinitionT = definitionT;
             _exempel = exempel;
-        }
-    }
-
-    class DiscordEmbedBuilderFromOrdEntry
-    {
-        public DiscordEmbedBuilder EmbedBuilder { get; private set; } = new DiscordEmbedBuilder();
-
-        public DiscordEmbedBuilderFromOrdEntry(OrdEntry ordEntry, int maxExamples = -1)
-        {
-            EmbedBuilder.AddField("Grundform", ordEntry.Grundform);
-
-            if (ordEntry.Böjningar != "")
-                EmbedBuilder.AddField("Böjningar", ordEntry.Böjningar);
-
-            for (int i = 0; i < ordEntry.Definitioner.Count(); i++)
-            {
-                var definitionEntry = ordEntry.Definitioner[i];
-
-                var definitionString = definitionEntry.Definition;
-                if (definitionEntry.DefinitionT != string.Empty)
-                    definitionString += $" ({ definitionEntry.DefinitionT })";
-
-                IEnumerable<string> examples = null;
-
-                if (maxExamples > 0)
-                {
-                    examples = definitionEntry.Exempel.Take(maxExamples);
-                }
-                else if (maxExamples == -1)
-                {
-                    examples = definitionEntry.Exempel;
-                }
-
-                // Make one string with line breaks since it takes less room than a header for each example.
-                if (examples != null && examples.Count() != 0)
-                {
-                    var newLine = "\n- ";
-                    definitionString += newLine;
-                    definitionString += string.Join(newLine, examples);
-                }
-
-                EmbedBuilder.AddField($"Definition { (i + 1).ToString() }", definitionString);
-            }
         }
     }
 }

@@ -3,49 +3,54 @@ using HtmlAgilityPack;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace svenskabot
 {
-    class ExempelMeningarResult
+    class ExempelMeningarResult : ISearchResult
     {
         public IReadOnlyList<string> Examples { get { return _examples; } }
         public string SourceUrl { get; private set; }
 
         private List<string> _examples { get; set; } = new List<string>();
 
+        public ExempelMeningarResult() { }
+
         public ExempelMeningarResult(List<string> examples, string sourceUrl)
         {
             _examples = examples;
             SourceUrl = sourceUrl;
         }
+
+        public DiscordEmbedBuilder AsEmbed()
+        {
+            var outEmbed = new DiscordEmbedBuilder();
+
+            const int maxExamples = 5;
+
+            var filteredExamples = maxExamples > 0 ? Examples.Take(maxExamples) : Examples;
+
+            if (filteredExamples.Count() != 0)
+            {
+                outEmbed.AddField("Exempel", string.Join("\n", filteredExamples));
+                outEmbed.AddField("Källa", SourceUrl);
+            }
+            else
+            {
+                outEmbed.AddField("Exempel", "Inga exempel hittades.");
+            }
+
+            return outEmbed;
+        }
     }
 
-    class ExempelMeningarSearcher
+    class ExempelMeningarSearcher : Searcher
     {
-        public string SearchTerm { get; private set; }
-
-        public string SourceUrl
+        public override string SearchUrl
         {
-            get { return RootUrl + SearchTerm; }
+            get { return "https://exempelmeningar.se/sv/" + SearchTerm; }
         }
 
-        private const string RootUrl = "https://exempelmeningar.se/sv/";
-
-        public ExempelMeningarSearcher(string searchTerm)
-        {
-            SearchTerm = searchTerm;
-        }
-
-        public async Task<ExempelMeningarResult> GetExamples()
-        {
-            var web = new HtmlWeb();
-            var doc = await web.LoadFromWebAsync(SourceUrl);
-
-            return GetExamples(doc);
-        }
-
-        private ExempelMeningarResult GetExamples(HtmlDocument htmlDocument)
+        protected override ISearchResult ProcessDoc(HtmlDocument htmlDocument)
         {
             var examples = new List<string>();
 
@@ -79,27 +84,7 @@ namespace svenskabot
                 }
             }
 
-            return new ExempelMeningarResult(examples, SourceUrl);
-        }
-    }
-
-    class DiscordEmbedBuilderFromExampelMeningarSearcher
-    {
-        public DiscordEmbedBuilder EmbedBuilder { get; private set; } = new DiscordEmbedBuilder();
-
-        public DiscordEmbedBuilderFromExampelMeningarSearcher(ExempelMeningarResult result, int maxExamples = -1)
-        {
-            var filteredExamples = maxExamples > 0 ? result.Examples.Take(maxExamples) : result.Examples;
-
-            if (filteredExamples.Count() != 0)
-            {
-                EmbedBuilder.AddField("Exempel", string.Join("\n", filteredExamples));
-                EmbedBuilder.AddField("Källa", result.SourceUrl);
-            }
-            else
-            {
-                EmbedBuilder.AddField("Exempel", "Inga exempel hittades.");
-            }
+            return new ExempelMeningarResult(examples, SearchUrl);
         }
     }
 }

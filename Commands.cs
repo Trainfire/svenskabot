@@ -19,38 +19,12 @@ namespace svenskabot
         }
 
         [Command("define"), Description("Searches SO for the specified word."), Aliases("definera")]
-        public async Task SearchSO(CommandContext ctx)
-        {
-            string searchTerm = ctx.RawArgumentString;
-            searchTerm = searchTerm.TrimStart();
-
-            // Show typing response whilst searching.
-            await ctx.TriggerTypingAsync();
-
-            var searcher = new SOSearcher(searchTerm);
-            var entry = await searcher.GetOrdEntry();
-
-            DiscordEmbedBuilder outBuilder;
-            if (entry != null)
-            {
-                outBuilder = new DiscordEmbedBuilderFromOrdEntry(entry, 1).EmbedBuilder;
-
-                var url = $"https://svenska.se/tre/?sok={ entry.Grundform }&pz=1";
-                url = url.Replace(" ", "+");
-
-                outBuilder.AddField("Källa", $"SO - { url }");
-            }
-            else
-            {
-                outBuilder = new DiscordEmbedBuilder();
-                outBuilder.AddField("No result found for", searchTerm);
-            }
-
-            await ctx.RespondAsync(embed: outBuilder);
-        }
+        public async Task SearchSO(CommandContext ctx) => await Search(ctx, new SOSearcher());
 
         [Command("examples"), Description("Searches exempelmeningar.se for the specified word."), Aliases("exempel")]
-        public async Task SearchExempelMeningar(CommandContext ctx)
+        public async Task SearchExempelMeningar(CommandContext ctx) => await Search(ctx, new ExempelMeningarSearcher());
+
+        private async Task Search(CommandContext ctx, ISearcher searcher)
         {
             string searchTerm = ctx.RawArgumentString;
             searchTerm = searchTerm.TrimStart();
@@ -58,11 +32,10 @@ namespace svenskabot
             // Show typing response whilst searching.
             await ctx.TriggerTypingAsync();
 
-            var searcher = new ExempelMeningarSearcher(searchTerm);
-            var result = await searcher.GetExamples();
-            var embedBuilder = new DiscordEmbedBuilderFromExampelMeningarSearcher(result, 5);
+            await searcher.Search(searchTerm);
 
-            await ctx.RespondAsync(embed: embedBuilder.EmbedBuilder);
+            if (searcher.LastResult != null)
+                await ctx.RespondAsync(embed: searcher.LastResult.AsEmbed());
         }
     }
 }

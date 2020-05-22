@@ -1,40 +1,56 @@
-﻿using HtmlAgilityPack;
-using System;
+﻿using DSharpPlus.Entities;
+using HtmlAgilityPack;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace svenskabot
 {
-    class SOSearcher
+    class SOSearchResult : ISearchResult
     {
-        public string SearchTerm { get; private set; }
+        private OrdEntry _ordEntry;
+        private string _searchTerm;
 
-        public string SourceUrl
+        public SOSearchResult(string searchTerm, OrdEntry ordEntry = null)
         {
-            get { return (RootUrl + SearchTerm).Replace(' ', '+'); }
+            _searchTerm = searchTerm;
+            _ordEntry = ordEntry;
         }
 
-        private const string RootUrl = "https://svenska.se/tri/f_so.php?sok=";
-
-        public SOSearcher(string searchTerm)
+        public DiscordEmbedBuilder AsEmbed()
         {
-            SearchTerm = searchTerm;
+            DiscordEmbedBuilder outBuilder;
+
+            if (_ordEntry == null)
+            {
+                outBuilder = new DiscordEmbedBuilder();
+                outBuilder.AddField("No result found for", _searchTerm);
+            }
+            else
+            {
+                outBuilder = _ordEntry.AsEmbed();
+
+                // NB: The url for viewing the source is different from the one used for parsing the entry.
+                var sourceUrl = $"https://svenska.se/tre/?sok={ _ordEntry.Grundform }&pz=1";
+                sourceUrl = sourceUrl.Replace(" ", "+");
+
+                outBuilder.AddField("Källa", $"SO - { sourceUrl }");
+            }
+
+            return outBuilder;
+        }
+    }
+
+    class SOSearcher : Searcher
+    {
+        public override string SearchUrl
+        {
+            get { return ("https://svenska.se/tri/f_so.php?sok=" + SearchTerm).Replace(' ', '+'); }
         }
 
-        public async Task<OrdEntry> GetOrdEntry()
-        {
-            var web = new HtmlWeb();
-            var doc = await web.LoadFromWebAsync(SourceUrl);
-
-            return GetEntry(doc);
-        }
-
-        private OrdEntry GetEntry(HtmlDocument htmlDocument)
+        protected override ISearchResult ProcessDoc(HtmlDocument htmlDocument)
         {
             if (!htmlDocument.DocumentNode.InnerHtml.Contains("lexem"))
-                return null;
+                return new SOSearchResult(SearchTerm);
 
             var lexemNodes = htmlDocument.DocumentNode
                 .SelectNodes("//*[@class='lexem']")
@@ -70,7 +86,9 @@ namespace svenskabot
             var ordklass = localParseClass("ordklass");
             var böjning = localParseClass("bojning");
 
-            return new OrdEntry(grundForm, ordklass, definitions, böjning);
+            var ordEntry = new OrdEntry(grundForm, ordklass, definitions, böjning);
+
+            return new SOSearchResult(SearchTerm, ordEntry);
         }
     }
 }
