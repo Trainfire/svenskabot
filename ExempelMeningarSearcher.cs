@@ -10,15 +10,17 @@ namespace svenskabot
     {
         public IReadOnlyList<string> Examples { get { return _examples; } }
         public string SourceUrl { get; private set; }
+        public string SearchTerm { get; private set; }
 
         private List<string> _examples { get; set; } = new List<string>();
 
         public ExempelMeningarResult() { }
 
-        public ExempelMeningarResult(List<string> examples, string sourceUrl)
+        public ExempelMeningarResult(List<string> examples, string sourceUrl, string searchTerm)
         {
             _examples = examples;
             SourceUrl = sourceUrl;
+            SearchTerm = searchTerm;
         }
 
         public DiscordEmbedBuilder AsEmbed()
@@ -27,11 +29,28 @@ namespace svenskabot
 
             const int maxExamples = 5;
 
-            var filteredExamples = maxExamples > 0 ? Examples.Take(maxExamples) : Examples;
+            var filteredExamples = (maxExamples > 0 ? Examples.Take(maxExamples) : Examples).ToList();
 
             if (filteredExamples.Count() != 0)
             {
-                outEmbed.AddField("Exempel", string.Join("\n", filteredExamples));
+                var outExamples = new List<string>();
+
+                for (int i = 0; i < filteredExamples.Count(); i++)
+                {
+                    var example = filteredExamples[i];
+
+                    // Make search term bold.
+                    var regex = new Regex(SearchTerm, RegexOptions.IgnoreCase);
+                    var match = regex.Match(example);
+                    example = example.Replace(match.Value, match.Value.ToBoldAndItalics());
+
+                    //  Make ordinal.
+                    example = $"{ i + 1 }. { example }.";
+
+                    outExamples.Add(example);
+                }
+
+                outEmbed.AddField("Exempel", string.Join("\n", outExamples));
                 outEmbed.AddField("Källa", SourceUrl);
             }
             else
@@ -70,21 +89,11 @@ namespace svenskabot
                 {
                     var text = sourceTextArr[i];
                     if (text != string.Empty)
-                    {
-                        // Make search term bold.
-                        var regex = new Regex(SearchTerm, RegexOptions.IgnoreCase);
-                        var match = regex.Match(text);
-                        text = text.Replace(match.Value, $"***{ match.Value }***");
-
-                        //  Make ordinal.
-                        text = $"{ i + 1 }. { text }.";
-
                         examples.Add(text);
-                    }
                 }
             }
 
-            return new ExempelMeningarResult(examples, SearchUrl);
+            return new ExempelMeningarResult(examples, SearchUrl, SearchTerm);
         }
     }
 }

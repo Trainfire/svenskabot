@@ -67,4 +67,11 @@ namespace svenskabot
             }
         }
     }
+
+    public static class DiscordTextFormatter
+    {
+        public static string ToBold(this string aString) { return $"**{ aString }**"; }
+        public static string ToBoldAndItalics(this string aString) { return $"***{ aString }***"; }
+        public static string ToItalics(this string aString) { return $"*{ aString }*"; }
+    }
 }

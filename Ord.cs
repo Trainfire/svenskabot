@@ -25,7 +25,7 @@ namespace svenskabot
             _definitioner = definitioner;
         }
 
-        public DiscordEmbedBuilder AsEmbed(int maxDefinitions = 5, int maxExamplesPerDefinition = 5)
+        public DiscordEmbedBuilder AsEmbed(int maxDefinitions = 5, int maxExamplesPerDefinition = 3)
         {
             var outBuilder = new DiscordEmbedBuilder();
 
@@ -44,23 +44,22 @@ namespace svenskabot
                 if (definitionEntry.DefinitionT != string.Empty)
                     definitionString += $" ({ definitionEntry.DefinitionT })";
 
-                IEnumerable<string> examples = null;
-
-                examples = definitionEntry.Exempel.Take(maxExamplesPerDefinition);
+                var examples = definitionEntry.Exempel?
+                    .Take(maxExamplesPerDefinition)
+                    .ToList();
 
                 // Make one string with line breaks since it takes less room than a header for each example.
                 if (examples != null && examples.Count() != 0)
-                {
-                    var newLine = "\n- ";
-                    definitionString += newLine;
-                    definitionString += string.Join(newLine, examples);
-                }
+                    examples.ForEach(example => definitionString += "\n- " + example.ToItalics());
 
                 outBuilder.AddField($"Definition { (i + 1).ToString() }", definitionString);
             }
 
             if (Definitioner.Count > maxDefinitions)
-                outBuilder.AddField("Obs", $"Det finns **{ Definitioner.Count - maxDefinitions }** definitioner till som kan hittas online.");
+            {
+                var additionalDefinitions = Definitioner.Count - maxDefinitions;
+                outBuilder.AddField("Obs!", $"Det finns { additionalDefinitions.ToString().ToBold() } definitioner till som kan hittas online.");
+            }
 
             return outBuilder;
         }
