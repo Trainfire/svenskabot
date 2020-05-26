@@ -1,4 +1,5 @@
 ﻿using DSharpPlus.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -24,7 +25,7 @@ namespace svenskabot
             _definitioner = definitioner;
         }
 
-        public DiscordEmbedBuilder AsEmbed()
+        public DiscordEmbedBuilder AsEmbed(int maxDefinitions = 5, int maxExamplesPerDefinition = 5)
         {
             var outBuilder = new DiscordEmbedBuilder();
 
@@ -33,7 +34,9 @@ namespace svenskabot
             if (Böjningar != "")
                 outBuilder.AddField("Böjningar", Böjningar);
 
-            for (int i = 0; i < Definitioner.Count(); i++)
+            int definitionCount = Math.Min(maxDefinitions, Definitioner.Count);
+
+            for (int i = 0; i < definitionCount; i++)
             {
                 var definitionEntry = Definitioner[i];
 
@@ -43,9 +46,7 @@ namespace svenskabot
 
                 IEnumerable<string> examples = null;
 
-                const int maxExamples = 5;
-
-                examples = definitionEntry.Exempel.Take(maxExamples);
+                examples = definitionEntry.Exempel.Take(maxExamplesPerDefinition);
 
                 // Make one string with line breaks since it takes less room than a header for each example.
                 if (examples != null && examples.Count() != 0)
@@ -57,6 +58,9 @@ namespace svenskabot
 
                 outBuilder.AddField($"Definition { (i + 1).ToString() }", definitionString);
             }
+
+            if (Definitioner.Count > maxDefinitions)
+                outBuilder.AddField("Obs", $"Det finns **{ Definitioner.Count - maxDefinitions }** definitioner till som kan hittas online.");
 
             return outBuilder;
         }
