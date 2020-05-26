@@ -18,10 +18,10 @@ namespace svenskabot
             await ctx.RespondAsync(embed: builder);
         }
 
-        [Command("define"), Description("Searches SO for the specified word."), Aliases("definera")]
+        [Command("define"), Description("Searches SO for the specified word."), Aliases("d", "definera")]
         public async Task SearchSO(CommandContext ctx) => await Search(ctx, new SOSearcher());
 
-        [Command("examples"), Description("Searches exempelmeningar.se for the specified word."), Aliases("exempel")]
+        [Command("examples"), Description("Searches exempelmeningar.se for the specified word."), Aliases("e", "exempel")]
         public async Task SearchExempelMeningar(CommandContext ctx) => await Search(ctx, new ExempelMeningarSearcher());
 
         private async Task Search(CommandContext ctx, ISearcher searcher)
