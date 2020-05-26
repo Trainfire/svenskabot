@@ -73,7 +73,9 @@ namespace svenskabot
                         .ForEach(x => exempel.Add(x.InnerText));
                 }
 
-                definitions.Add(new OrdDefinition(definitionNode.InnerText, definitionTNode != null ? definitionTNode.InnerText : "", exempel));
+                var definition = definitionNode?.InnerText ?? string.Empty;
+                var definitionT = definitionTNode?.InnerText ?? string.Empty;
+                definitions.Add(new OrdDefinition(definition, definitionT, exempel));
             }
 
             string localParseClass(string className)
