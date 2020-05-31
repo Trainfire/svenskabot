@@ -1,12 +1,13 @@
 ﻿using DSharpPlus.Entities;
 using HtmlAgilityPack;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace svenskabot
 {
     public interface ISearchResult
     {
-        public DiscordEmbedBuilder AsEmbed();
+        public List<DiscordEmbedBuilder> AsEmbeds();
     }
 
     public interface ISearcher

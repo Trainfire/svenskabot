@@ -30,6 +30,7 @@ namespace svenskabot
             var outBuilder = new DiscordEmbedBuilder();
 
             outBuilder.AddField("Grundform", Grundform);
+            outBuilder.AddField("Ordklass", Ordklass);
 
             if (Böjningar != "")
                 outBuilder.AddField("Böjningar", Böjningar);

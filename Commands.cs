@@ -35,7 +35,12 @@ namespace svenskabot
             await searcher.Search(searchTerm);
 
             if (searcher.LastResult != null)
-                await ctx.RespondAsync(embed: searcher.LastResult.AsEmbed());
+            {
+                searcher.LastResult.AsEmbeds().ForEach(async e =>
+                {
+                    await ctx.RespondAsync(embed: e);
+                });
+            }
         }
     }
 }

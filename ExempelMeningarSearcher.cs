@@ -23,7 +23,7 @@ namespace svenskabot
             SearchTerm = searchTerm;
         }
 
-        public DiscordEmbedBuilder AsEmbed()
+        public List<DiscordEmbedBuilder> AsEmbeds()
         {
             var outEmbed = new DiscordEmbedBuilder();
 
@@ -58,7 +58,10 @@ namespace svenskabot
                 outEmbed.AddField("Exempel", "Inga exempel hittades.");
             }
 
-            return outEmbed;
+            var outEmbeds = new List<DiscordEmbedBuilder>();
+            outEmbeds.Add(outEmbed);
+
+            return new List<DiscordEmbedBuilder>(outEmbeds);
         }
     }
 
