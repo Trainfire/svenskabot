@@ -18,7 +18,7 @@ namespace svenskabot
         ISearchResult LastResult { get; }
     }
 
-    abstract class Searcher : ISearcher
+    public abstract class Searcher : ISearcher
     {
         public string SearchTerm { get; private set; }
         public abstract string SearchUrl { get; }

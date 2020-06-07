@@ -29,8 +29,11 @@ namespace svenskabot
         {
             var outBuilder = new DiscordEmbedBuilder();
 
-            outBuilder.AddField("Grundform", Grundform);
-            outBuilder.AddField("Ordklass", Ordklass);
+            if (Grundform != null && Grundform != string.Empty)
+                outBuilder.AddField("Grundform", Grundform);
+
+            if (Ordklass != null && Ordklass != string.Empty)
+                outBuilder.AddField("Ordklass", Ordklass);
 
             if (Böjningar != "")
                 outBuilder.AddField("Böjningar", Böjningar);
@@ -42,7 +45,7 @@ namespace svenskabot
                 var definitionEntry = Definitioner[i];
 
                 var definitionString = definitionEntry.Definition;
-                if (definitionEntry.DefinitionT != string.Empty)
+                if (definitionEntry.DefinitionT != null)
                     definitionString += $" ({ definitionEntry.DefinitionT })";
 
                 var examples = definitionEntry.Exempel?
@@ -79,6 +82,11 @@ namespace svenskabot
             Definition = definition;
             DefinitionT = definitionT;
             _exempel = exempel;
+        }
+
+        public bool IsValid()
+        {
+            return Definition != null && Definition != string.Empty || DefinitionT != null && DefinitionT != string.Empty;
         }
     }
 }
