@@ -21,7 +21,7 @@ namespace svenskabot
         [Command("d")]
         public async Task SearchDeprecated(CommandContext ctx)
         {
-            await ctx.RespondAsync($"Det här kommandot har tagits bort. Använd { "!so".ToItalics() } och { "!saol".ToItalics() } istället");
+            await ctx.RespondAsync($"Det här kommandot har tagits bort. Använd { "!so".ToItalics() } eller { "!saol".ToItalics() } istället");
         }
 
         [Command("so"), Description("Searches SO for the specified word.")]
