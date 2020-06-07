@@ -25,8 +25,10 @@ namespace svenskabot
             _definitioner = definitioner;
         }
 
-        public DiscordEmbedBuilder AsEmbed(int maxDefinitions = 5, int maxExamplesPerDefinition = 3)
+        public DiscordEmbedBuilder AsEmbed()
         {
+            int maxDefinitions = ConfigInstance.Config.Ord.MaxDefinitions;
+
             var outBuilder = new DiscordEmbedBuilder();
 
             if (Grundform != null && Grundform != string.Empty)
@@ -49,7 +51,7 @@ namespace svenskabot
                     definitionString += $" ({ definitionEntry.DefinitionT })";
 
                 var examples = definitionEntry.Exempel?
-                    .Take(maxExamplesPerDefinition)
+                    .Take(ConfigInstance.Config.Ord.MaxExamplesPerDefinition)
                     .ToList();
 
                 // Make one string with line breaks since it takes less room than a header for each example.

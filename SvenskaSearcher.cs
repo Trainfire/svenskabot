@@ -29,8 +29,7 @@ namespace svenskabot
             }
             else
             {
-                const int maxEmbeds = 2;
-
+                int maxEmbeds = ConfigInstance.Config.SvenskaSearcher.MaxEmbeds;
                 int count = Math.Min(maxEmbeds, _ordEntries.Count());
 
                 for (int i = 0; i < count; i++)

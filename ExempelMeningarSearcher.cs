@@ -27,7 +27,7 @@ namespace svenskabot
         {
             var outEmbed = new DiscordEmbedBuilder();
 
-            const int maxExamples = 5;
+            int maxExamples = ConfigInstance.Config.ExempelMeningar.MaxSentences;
 
             var filteredExamples = (maxExamples > 0 ? Examples.Take(maxExamples) : Examples).ToList();
 
