@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using System.IO;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
+using DSharpPlus.Entities;
 
 namespace svenskabot
 {
@@ -73,5 +74,14 @@ namespace svenskabot
         public static string ToBold(this string aString) { return $"**{ aString }**"; }
         public static string ToBoldAndItalics(this string aString) { return $"***{ aString }***"; }
         public static string ToItalics(this string aString) { return $"*{ aString }*"; }
+    }
+
+    public static class DiscordEmbedBuilderEx
+    {
+        // See here: https://support.discord.com/hc/en-us/community/posts/360056286551--BUG-Infinite-Scroll-Embed-Android-
+        public static void HackFixWidth(this DiscordEmbedBuilder discordEmbedBuilder)
+        {
+            discordEmbedBuilder.WithDescription("------------------------------------------------------");
+        }
     }
 }

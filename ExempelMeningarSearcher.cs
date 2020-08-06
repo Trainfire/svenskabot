@@ -26,6 +26,7 @@ namespace svenskabot
         public List<DiscordEmbedBuilder> AsEmbeds()
         {
             var outEmbed = new DiscordEmbedBuilder();
+            outEmbed.HackFixWidth();
 
             int maxExamples = ConfigInstance.Config.ExempelMeningar.MaxSentences;
 

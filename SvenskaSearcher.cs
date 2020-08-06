@@ -38,6 +38,7 @@ namespace svenskabot
 
                     var outBuilder = new DiscordEmbedBuilder();
                     outBuilder = ordEntry.AsEmbed();
+                    outBuilder.HackFixWidth();
 
                     // NB: The url for viewing the source is different from the one used for parsing the entry.
                     var sourceUrl = $"https://svenska.se/tre/?sok={ ordEntry.Grundform }&pz=1";
