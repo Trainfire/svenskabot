@@ -39,6 +39,13 @@ namespace svenskabot
         private async Task Search(CommandContext ctx, ISearcher searcher)
         {
             string searchTerm = ctx.RawArgumentString;
+
+            if (searchTerm == null)
+            {
+                await ctx.RespondAsync("Du måste ange ett sökord.");
+                return;
+            }
+
             searchTerm = searchTerm.TrimStart();
 
             // Show typing response whilst searching.
