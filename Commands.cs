@@ -33,6 +33,9 @@ namespace svenskabot
         [Command("examples"), Description("Searches exempelmeningar.se for the specified word."), Aliases("e", "exempel")]
         public async Task SearchExempelMeningar(CommandContext ctx) => await Search(ctx, new ExempelMeningarSearcher());
 
+        [Command("uttal"), Description("Searches forvo.com for the specified word."), Aliases("u")]
+        public async Task SearchForvo(CommandContext ctx) => await Search(ctx, new ForvoSearcher());
+
         private async Task Search(CommandContext ctx, ISearcher searcher)
         {
             string searchTerm = ctx.RawArgumentString;
