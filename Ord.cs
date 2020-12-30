@@ -5,10 +5,23 @@ using System.Linq;
 
 namespace svenskabot
 {
+    class OrdEntryBuilder
+    {
+        public string Grundform { get; set; }
+        public string Ordklass { get; set; }
+        public string Böjningar { get; set; }
+        public List<OrdDefinition> Definitioner = new List<OrdDefinition>();
+
+        public OrdEntry AsNew()
+        {
+            return new OrdEntry(Grundform, Ordklass, Definitioner, Böjningar);
+        }
+    }
+
     /// <summary>
     /// Generic classes since we might want to use them for other dictionary searches.
     /// </summary>
-    class OrdEntry
+    public class OrdEntry
     {
         public string Grundform { get; private set; }
         public string Ordklass { get; private set; }
@@ -27,7 +40,7 @@ namespace svenskabot
 
         public DiscordEmbedBuilder AsEmbed()
         {
-            int maxDefinitions = ConfigInstance.Config.Ord.MaxDefinitions;
+            int maxDefinitions = Resources.Config.Ord.MaxDefinitions;
 
             var outBuilder = new DiscordEmbedBuilder();
 
@@ -37,7 +50,7 @@ namespace svenskabot
             if (Ordklass != null && Ordklass != string.Empty)
                 outBuilder.AddField("Ordklass", Ordklass);
 
-            if (Böjningar != "")
+            if (Böjningar != null && Böjningar != string.Empty)
                 outBuilder.AddField("Böjningar", Böjningar);
 
             int definitionCount = Math.Min(maxDefinitions, Definitioner.Count);
@@ -51,7 +64,7 @@ namespace svenskabot
                     definitionString += $" ({ definitionEntry.DefinitionT })";
 
                 var examples = definitionEntry.Exempel?
-                    .Take(ConfigInstance.Config.Ord.MaxExamplesPerDefinition)
+                    .Take(Resources.Config.Ord.MaxExamplesPerDefinition)
                     .ToList();
 
                 // Make one string with line breaks since it takes less room than a header for each example.
@@ -71,7 +84,19 @@ namespace svenskabot
         }
     }
 
-    class OrdDefinition
+    class OrdDefinitionBuilder
+    {
+        public OrdDefinition AsNew()
+        {
+            return new OrdDefinition(Definition, DefinitionT, Exempel);
+        }
+
+        public string Definition { get; set; }
+        public string DefinitionT { get; set; }
+        public List<string> Exempel { get; set; } = new List<string>();
+    }
+
+    public class OrdDefinition
     {
         public string Definition { get; private set; }
         public string DefinitionT { get; private set; }
@@ -81,8 +106,8 @@ namespace svenskabot
 
         public OrdDefinition(string definition, string definitionT, List<string> exempel)
         {
-            Definition = definition;
-            DefinitionT = definitionT;
+            Definition = definition ?? "N/A";
+            DefinitionT = definitionT ?? "N/A";
             _exempel = exempel;
         }
 

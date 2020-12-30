@@ -10,21 +10,21 @@ namespace svenskabot
         public List<DiscordEmbedBuilder> AsEmbeds();
     }
 
-    public interface ISearcher
+    public interface ISearcherAsync
     {
         string SearchTerm { get; }
-        string SearchUrl { get; }
-        Task Search(string searchTerm);
+        Task SearchAsync(string searchTerm);
         ISearchResult LastResult { get; }
     }
 
-    public abstract class Searcher : ISearcher
+    public abstract class Searcher : ISearcherAsync
     {
         public string SearchTerm { get; private set; }
         public abstract string SearchUrl { get; }
         public ISearchResult LastResult { get; private set; } = default;
 
-        public async Task Search(string searchTerm) 
+
+        public async Task SearchAsync(string searchTerm) 
         {
             SearchTerm = searchTerm;
 

@@ -25,18 +25,21 @@ namespace svenskabot
         }
 
         [Command("so"), Description("Searches SO for the specified word.")]
-        public async Task SearchSO(CommandContext ctx) => await Search(ctx, new SvenskaSearcher(SvenskaKälla.SO));
+        public async Task SearchSO(CommandContext ctx) => await SearchAsync(ctx, new SvenskaSearcher(SvenskaKälla.SO));
 
         [Command("saol"), Description("Searches SAOL for the specified word.")]
-        public async Task SearchSAOL(CommandContext ctx) => await Search(ctx, new SvenskaSearcher(SvenskaKälla.SAOL));
+        public async Task SearchSAOL(CommandContext ctx) => await SearchAsync(ctx, new SvenskaSearcher(SvenskaKälla.SAOL));
 
         [Command("examples"), Description("Searches exempelmeningar.se for the specified word."), Aliases("e", "exempel")]
-        public async Task SearchExempelMeningar(CommandContext ctx) => await Search(ctx, new ExempelMeningarSearcher());
+        public async Task SearchExempelMeningar(CommandContext ctx) => await SearchAsync(ctx, new ExempelMeningarSearcher());
 
         [Command("uttal"), Description("Searches forvo.com for the specified word."), Aliases("u")]
-        public async Task SearchForvo(CommandContext ctx) => await Search(ctx, new ForvoSearcher());
+        public async Task SearchForvo(CommandContext ctx) => await SearchAsync(ctx, new ForvoSearcher());
 
-        private async Task Search(CommandContext ctx, ISearcher searcher)
+        [Command("folkets")]
+        public async Task SearchFolketsOrdbok(CommandContext ctx) => await SearchAsync(ctx, new FolketsOrdbokSearcher());
+
+        private async Task SearchAsync(CommandContext ctx, ISearcherAsync searcher)
         {
             string searchTerm = ctx.RawArgumentString;
 
@@ -51,7 +54,7 @@ namespace svenskabot
             // Show typing response whilst searching.
             await ctx.TriggerTypingAsync();
 
-            await searcher.Search(searchTerm);
+            await searcher.SearchAsync(searchTerm);
 
             if (searcher.LastResult != null)
             {

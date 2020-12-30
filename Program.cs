@@ -4,6 +4,7 @@ using System.IO;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
+using System.Net;
 
 namespace svenskabot
 {
@@ -14,6 +15,7 @@ namespace svenskabot
 
         static void Main(string[] args)
         {
+            Resources.Initialize();
             MainAsync(GetToken()).ConfigureAwait(false).GetAwaiter().GetResult();
         }
 
