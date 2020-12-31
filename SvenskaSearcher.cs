@@ -8,7 +8,9 @@ namespace svenskabot
 {
     class SvenskaSearchResult : ISearchResult
     {
-        private List<OrdEntry> _ordEntries;
+        public IReadOnlyList<OrdEntry> OrdEntries { get { return _ordEntries; } }
+
+        private List<OrdEntry> _ordEntries = new List<OrdEntry>();
         private string _searchTerm;
 
         public SvenskaSearchResult(string searchTerm, List<OrdEntry> ordEntries = null)
