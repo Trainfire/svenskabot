@@ -163,6 +163,13 @@ namespace FolketsOrdbokResource
 					folketsOrdbokSource = (FolketsOrdbokSource)(serializer.Deserialize(file));
 				}
 			}
+			else
+            {
+				Console.WriteLine("Failed to load Folkets Ordbok.");
+            }
+
+			if (folketsOrdbokSource == null)
+				return;
 
 			foreach (var word in folketsOrdbokSource.Words)
             {
