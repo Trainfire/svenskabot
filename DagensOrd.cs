@@ -95,7 +95,7 @@ namespace svenskabot
                 }
             }
 
-            using (var sw = File.CreateText(FileName))
+            using (var sw = File.CreateText(Path))
             {
                 sw.Write(JsonConvert.SerializeObject(Entry, Formatting.Indented));
             }
