@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System;
 using svenskabot;
+using System.IO;
+using System.Net;
 
 namespace FolketsOrdbokResource
 {
@@ -127,9 +129,42 @@ namespace FolketsOrdbokResource
     {
 		public List<OrdEntry> Words { get; private set; } = new List<OrdEntry>();
 
-		public FolketsOrdbok(FolketsOrdbokSource folketsOrdbokSource)
+		private static string FolketsOrdbokFileName { get; } = "folkets";
+
+		public FolketsOrdbok()
         {
-            foreach (var word in folketsOrdbokSource.Words)
+			var path = AppDomain.CurrentDomain.BaseDirectory + FolketsOrdbokFileName;
+
+			Console.WriteLine("Downloading lexicon from Folkets Ordbok...");
+
+			if (File.Exists(path))
+			{
+				Console.WriteLine("Lexicon from Folkets Ordbok already exists. Skipping download...");
+			}
+			else
+			{
+				using (var client = new WebClient())
+				{
+					// TODO: Check if URL is valid...
+					client.DownloadFile(Resources.Config.Sources.FolketsOrdbokLexicon, FolketsOrdbokFileName);
+				}
+
+				Console.WriteLine("Finished downloading lexicon from Folkets Ordbok.");
+			}
+
+			FolketsOrdbokSource folketsOrdbokSource = null;
+
+			if (File.Exists(path))
+			{
+				using (var file = File.OpenText(path))
+				{
+					var serializer = new XmlSerializer(typeof(FolketsOrdbokSource));
+
+					folketsOrdbokSource = (FolketsOrdbokSource)(serializer.Deserialize(file));
+				}
+			}
+
+			foreach (var word in folketsOrdbokSource.Words)
             {
 				var definitionBuilder = new OrdDefinitionBuilder();
 

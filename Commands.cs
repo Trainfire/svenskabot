@@ -39,6 +39,9 @@ namespace svenskabot
         [Command("folkets")]
         public async Task SearchFolketsOrdbok(CommandContext ctx) => await SearchAsync(ctx, new FolketsOrdbokSearcher());
 
+        [Command("dagensord")]
+        public async Task GetDagensOrd(CommandContext ctx) => await ctx.RespondAsync(embed: Resources.DagensOrd.Entry.AsEmbed());
+
         private async Task SearchAsync(CommandContext ctx, ISearcherAsync searcher)
         {
             string searchTerm = ctx.RawArgumentString;
