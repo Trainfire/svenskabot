@@ -83,7 +83,7 @@ namespace svenskabot
             {
                 var convertedResult = (SvenskaSearchResult)searcher.LastResult;
 
-                if (convertedResult.OrdEntries.Count != 0)
+                if (convertedResult.OrdEntries != null && convertedResult.OrdEntries.Count != 0)
                 {
                     Console.WriteLine("Success!");
 
