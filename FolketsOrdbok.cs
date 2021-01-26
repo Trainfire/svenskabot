@@ -146,7 +146,7 @@ namespace FolketsOrdbokResource
 				using (var client = new WebClient())
 				{
 					// TODO: Check if URL is valid...
-					client.DownloadFile(Resources.Config.Sources.FolketsOrdbokLexicon, FolketsOrdbokFileName);
+					client.DownloadFile(Resources.ConstantData.Sources.FolketsOrdbokLexicon, FolketsOrdbokFileName);
 				}
 
 				Console.WriteLine("Finished downloading lexicon from Folkets Ordbok.");

@@ -9,17 +9,14 @@ namespace svenskabot
 {
     public static class Resources
     {
-        public static Config Config { get; private set; }
-        public static FolketsOrdbok FolketsOrdbok { get; private set; }
-        public static DagensOrd DagensOrd { get; private set; }
+        public static ConstantData ConstantData { get; private set; }
+        public static RuntimeData RuntimeData { get; private set; } = new RuntimeData();
 
         private static string ConfigPath { get { return AppDomain.CurrentDomain.BaseDirectory + "config"; } }
 
         public static void Initialize()
         {
             LoadConfig();
-            FolketsOrdbok = new FolketsOrdbok();
-            DagensOrd = new DagensOrd(FolketsOrdbok);
         }
 
         static void LoadConfig()
@@ -28,16 +25,16 @@ namespace svenskabot
             {
                 using (var file = File.OpenText(ConfigPath))
                 {
-                    Config = JsonConvert.DeserializeObject<Config>(file.ReadToEnd());
+                    ConstantData = JsonConvert.DeserializeObject<ConstantData>(file.ReadToEnd());
                 }
             }
             else
             {
-                Config = new Config();
+                ConstantData = new ConstantData();
 
                 using (var sw = File.CreateText(ConfigPath))
                 {
-                    sw.Write(JsonConvert.SerializeObject(Config, Formatting.Indented));
+                    sw.Write(JsonConvert.SerializeObject(ConstantData, Formatting.Indented));
                 }
             }
         }

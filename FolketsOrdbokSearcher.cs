@@ -44,7 +44,7 @@ namespace svenskabot
             {
                 OrdEntry foundWord = null;
 
-                foreach (var word in Resources.FolketsOrdbok.Words)
+                foreach (var word in Resources.RuntimeData.FolketsOrdbok.Words)
                 {
                     if (word.Grundform == searchTerm)
                     {

@@ -1,11 +1,12 @@
 ﻿namespace svenskabot
 {
-    public class Config
+    public class ConstantData
     {
         public ExternalSources Sources { get; set; } = new ExternalSources();
         public ExempelMeningarConfig ExempelMeningar { get; set; } = new ExempelMeningarConfig();
         public SvenskaSearcherConfig SvenskaSearcher { get; set; } = new SvenskaSearcherConfig();
         public OrdConfig Ord { get; set; } = new OrdConfig();
+        public DagensOrdConfig DagensOrd { get; set; } = new DagensOrdConfig();
 
         public class ExternalSources
         {
@@ -27,6 +28,11 @@
         {
             public int MaxDefinitions { get; set; } = 2;
             public int MaxExamplesPerDefinition { get; set; } = 5;
+        }
+
+        public class DagensOrdConfig
+        {
+            public string ChannelID { get; set; }
         }
     }
 }
