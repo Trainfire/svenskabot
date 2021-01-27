@@ -31,11 +31,12 @@ namespace svenskabot
             else
             {
                 ConstantData = new ConstantData();
+            }
 
-                using (var sw = File.CreateText(ConfigPath))
-                {
-                    sw.Write(JsonConvert.SerializeObject(ConstantData, Formatting.Indented));
-                }
+            // Save new file or overwrite existing one to keep structure updated.
+            using (var sw = File.CreateText(ConfigPath))
+            {
+                sw.Write(JsonConvert.SerializeObject(ConstantData, Formatting.Indented));
             }
         }
     }

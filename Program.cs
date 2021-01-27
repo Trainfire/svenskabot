@@ -37,6 +37,9 @@ namespace svenskabot
             commands.RegisterCommands<Commands>();
 
             await discord.ConnectAsync();
+
+            discord.AddModule(new DagensOrdModule());
+
             await Task.Delay(-1);
         }
 

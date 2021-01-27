@@ -32,6 +32,10 @@
 
         public class DagensOrdConfig
         {
+            public int AnnounceHour { get; set; }
+            public int AnnounceMinute { get; set; }
+            public int MSDelayBetweenSearches { get; set; }
+            public bool IsDebugEnabled { get; set; }
             public string ChannelID { get; set; }
         }
     }
