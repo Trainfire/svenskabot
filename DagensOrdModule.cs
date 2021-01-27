@@ -127,7 +127,7 @@ namespace svenskabot
                     _targetTime = _targetTime.AddDays(1);
             }
 
-            Log($"Dagensord will be updated at: { _targetTime.ToLongTimeString() }");
+            Log($"Dagensord will be updated at: { _targetTime.ToString() }");
         }
 
         private async Task GetDagensOrd()
