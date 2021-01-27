@@ -23,21 +23,19 @@ namespace svenskabot
         {
             _discordClient = client;
 
-            if (Resources.ConstantData.DagensOrd.IsDebugEnabled)
-                LogWarning("Debug mode is enabled.");
+            _discordClient.Ready += (e) =>
+            {
+                if (Resources.ConstantData.DagensOrd.IsDebugEnabled)
+                    LogWarning("Debug mode is enabled.");
 
-            LoadDagensOrdFromFile();
+                LoadDagensOrdFromFile();
 
-            _discordClient.Ready += OnReady;
-        }
+                TryGetChannel(_discordClient);
 
-        private Task OnReady(DSharpPlus.EventArgs.ReadyEventArgs e)
-        {
-            TryGetChannel(_discordClient);
+                Task.Run(Update);
 
-            _discordClient.Ready -= OnReady;
-
-            return Task.Run(Update);
+                return Task.CompletedTask;
+            };
         }
 
         private void LoadDagensOrdFromFile()
