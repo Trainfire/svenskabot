@@ -28,17 +28,14 @@ namespace svenskabot
 
             LoadDagensOrdFromFile();
 
-            // TODO: Figure out better way to ensure that we are connected and ready.
-            _discordClient.Heartbeated += OnHeartbeated;
+            _discordClient.Ready += OnReady;
         }
 
-        private Task OnHeartbeated(DSharpPlus.EventArgs.HeartbeatEventArgs e)
+        private Task OnReady(DSharpPlus.EventArgs.ReadyEventArgs e)
         {
-            Log("Ready");
-
             TryGetChannel(_discordClient);
 
-            _discordClient.Heartbeated -= OnHeartbeated;
+            _discordClient.Ready -= OnReady;
 
             return Task.Run(Update);
         }
