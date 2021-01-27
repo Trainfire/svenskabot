@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -96,7 +98,30 @@ namespace svenskabot
                     {
                         Log($"Posting to channel: { _discordChannel.Name }");
 
-                        await _discordChannel.SendMessageAsync(content: "Dagensord är...", embed: Entry.AsEmbed());
+                        var strings = new List<string>();
+
+                        if (DateTime.Now.DayOfWeek == DayOfWeek.Friday)
+                        {
+                            strings.Add($"God fredag mina bekanta!");
+
+                            DiscordEmoji grodanEmoji = null;
+
+                            try
+                            {
+                                grodanEmoji = DiscordEmoji.FromName(_discordClient, $":{ Resources.ConstantData.DagensOrd.GrodanEmoji }:");
+                            }
+                            catch
+                            {
+                                LogWarning("Could not find emoji...");
+                            }
+
+                            if (grodanEmoji != null)
+                                strings.Add($"{ grodanEmoji }");
+                        }
+
+                        strings.Add("Dagensord är...");
+
+                        await _discordChannel.SendMessageAsync(content: string.Join(" ", strings), embed: Entry.AsEmbed());
                     }
 
                     UpdateTargetTime();
@@ -110,7 +135,7 @@ namespace svenskabot
         {
             if (Resources.ConstantData.DagensOrd.IsDebugEnabled)
             {
-                _targetTime = DateTime.Now.AddSeconds(30);
+                _targetTime = DateTime.Now.AddSeconds(15);
             }
             else
             {
