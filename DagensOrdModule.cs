@@ -121,7 +121,7 @@ namespace svenskabot
                                 strings.Add($"{ grodanEmoji }");
                         }
 
-                        strings.Add("Dagensord är...");
+                        strings.Add("Dagens ord är...");
 
                         await _discordChannel.SendMessageAsync(content: string.Join(" ", strings), embed: Entry.AsEmbed());
                     }
