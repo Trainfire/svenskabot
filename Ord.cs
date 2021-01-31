@@ -28,14 +28,14 @@ namespace svenskabot
         public string Böjningar { get; private set; }
         public IReadOnlyList<OrdDefinition> Definitioner { get { return _definitioner; } }
 
-        private List<OrdDefinition> _definitioner { get; set; } = new List<OrdDefinition>();
+        private List<OrdDefinition> _definitioner { get; set; }
 
         public OrdEntry(string grundform, string ordklass, List<OrdDefinition> definitioner, string böjningar)
         {
-            Grundform = grundform;
-            Ordklass = ordklass;
-            Böjningar = böjningar;
-            _definitioner = definitioner;
+            Grundform = grundform ?? string.Empty;
+            Ordklass = ordklass ?? string.Empty;
+            Böjningar = böjningar ?? string.Empty;
+            _definitioner = definitioner ?? new List<OrdDefinition>();
         }
 
         public DiscordEmbedBuilder AsEmbed()
@@ -44,13 +44,13 @@ namespace svenskabot
 
             var outBuilder = new DiscordEmbedBuilder();
 
-            if (Grundform != null && Grundform != string.Empty)
+            if (!string.IsNullOrEmpty(Grundform))
                 outBuilder.AddField("Grundform", Grundform);
 
-            if (Ordklass != null && Ordklass != string.Empty)
+            if (!string.IsNullOrEmpty(Ordklass))
                 outBuilder.AddField("Ordklass", Ordklass);
 
-            if (Böjningar != null && Böjningar != string.Empty)
+            if (!string.IsNullOrEmpty(Böjningar))
                 outBuilder.AddField("Böjningar", Böjningar);
 
             int definitionCount = Math.Min(maxDefinitions, Definitioner.Count);
@@ -60,15 +60,15 @@ namespace svenskabot
                 var definitionEntry = Definitioner[i];
 
                 var definitionString = definitionEntry.Definition;
-                if (definitionEntry.DefinitionT != null)
+                if (!string.IsNullOrEmpty(definitionEntry.DefinitionT))
                     definitionString += $" ({ definitionEntry.DefinitionT })";
 
-                var examples = definitionEntry.Exempel?
+                var examples = definitionEntry.Exempel
                     .Take(Resources.ConstantData.Ord.MaxExamplesPerDefinition)
                     .ToList();
 
                 // Make one string with line breaks since it takes less room than a header for each example.
-                if (examples != null && examples.Count() != 0)
+                if (examples.Count() != 0)
                     examples.ForEach(example => definitionString += "\n- " + example.ToItalics());
 
                 outBuilder.AddField($"Definition { (i + 1).ToString() }", definitionString);
@@ -106,14 +106,14 @@ namespace svenskabot
 
         public OrdDefinition(string definition, string definitionT, List<string> exempel)
         {
-            Definition = definition ?? "N/A";
-            DefinitionT = definitionT ?? "N/A";
-            _exempel = exempel;
+            Definition = definition ?? string.Empty;
+            DefinitionT = definitionT ?? string.Empty;
+            _exempel = exempel ?? new List<string>();
         }
 
         public bool IsValid()
         {
-            return Definition != null && Definition != string.Empty || DefinitionT != null && DefinitionT != string.Empty;
+            return Definition != string.Empty || DefinitionT != string.Empty;
         }
     }
 }
