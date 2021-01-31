@@ -159,49 +159,71 @@ namespace svenskabot
 
         private async Task GetDagensOrd()
         {
-            var ordbok = Resources.RuntimeData.FolketsOrdbok;
+            GetRandomWord();
 
             bool resultFound = false;
 
             while (!resultFound)
             {
-                var r = new Random().Next(0, ordbok.Words.Count - 1);
-
-                Entry = ordbok.Words[r];
-
-                Log($"Target word is: { Entry.Grundform }. Searching on SO...");
+                Log($"Searching on SO for: { Entry.Grundform }...");
 
                 var searcher = new SvenskaSearcher(SvenskaKälla.SO);
 
-                await searcher.SearchAsync(Entry.Grundform);
+                var searcherTask = searcher.SearchAsync(Entry.Grundform);
 
-                if (searcher.LastResult != null)
+                await searcherTask;
+
+                if (searcherTask.Result == SearchResponse.WebException)
                 {
-                    var convertedResult = (SvenskaSearchResult)searcher.LastResult;
+                    var timespan = TimeSpan.FromMinutes(5);
 
-                    if (convertedResult.OrdEntries != null && convertedResult.OrdEntries.Count != 0)
-                    {
-                        Log($"Success! Dagensord is now: { Entry.Grundform }");
+                    LogWarning($"Received a WebException. Will try again in { timespan.TotalSeconds } seconds.");
 
-                        Entry = convertedResult.OrdEntries.First();
-
-                        resultFound = true;
-                    }
-                    else
-                    {
-                        var delay = Resources.ConstantData.DagensOrd.MSDelayBetweenSearches;
-
-                        Log($"Failed to fetch entry from SO. Trying again in { delay }ms...");
-
-                        await Task.Delay(delay);
-                    }
+                    await Task.Delay(timespan);
                 }
+                else
+                {
+                    if (searcherTask.Result == SearchResponse.Successful)
+                    {
+                        var convertedResult = (SvenskaSearchResult)searcher.LastResult;
+
+                        if (convertedResult.OrdEntries != null && convertedResult.OrdEntries.Count != 0)
+                        {
+                            Log($"Success! Dagensord is now: { Entry.Grundform }");
+
+                            Entry = convertedResult.OrdEntries.First();
+
+                            resultFound = true;
+                        }
+                        else
+                        {
+                            var delay = Resources.ConstantData.DagensOrd.MSDelayBetweenSearches;
+
+                            Log($"Failed to fetch entry from SO. Trying again in { delay }ms...");
+
+                            GetRandomWord();
+
+                            await Task.Delay(delay);
+                        }
+                    }
+                }                
             }
 
             using (var sw = File.CreateText(Path))
             {
                 sw.Write(JsonConvert.SerializeObject(Entry, Formatting.Indented));
             }
+        }
+
+        private void GetRandomWord()
+        {
+            var ordbok = Resources.RuntimeData.FolketsOrdbok;
+
+            var r = new Random().Next(0, ordbok.Words.Count - 1);
+
+            Entry = ordbok.Words[r];
+
+            Log($"Seeding new word from Folketsordbok... New word is: { Entry.Grundform }.");
         }
 
         private void Log(string message, LogLevel logLevel = LogLevel.Info)

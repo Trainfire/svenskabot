@@ -38,9 +38,9 @@ namespace svenskabot
 
         public ISearchResult LastResult { get; private set; }
 
-        public Task SearchAsync(string searchTerm)
+        public async Task<SearchResponse> SearchAsync(string searchTerm)
         {
-            var task = new Task(() =>
+            await Task.Run(() =>
             {
                 OrdEntry foundWord = null;
 
@@ -55,9 +55,7 @@ namespace svenskabot
                 LastResult = new FolketsOrdbokResult(searchTerm, foundWord);
             });
 
-            task.RunSynchronously();
-
-            return task;
+            return SearchResponse.Successful;
         }
     }
 }
