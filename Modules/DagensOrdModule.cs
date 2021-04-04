@@ -148,17 +148,6 @@ namespace svenskabot
                 // Start from today since bot may have been started prior to showing dagensord.
                 _targetTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, targetTimespan.Hours, targetTimespan.Minutes, targetTimespan.Seconds);
 
-                // Adjust for timezone.
-                try
-                {
-                    var timeZone = TimeZoneInfo.FindSystemTimeZoneById(Resources.ConstantData.DagensOrd.Timezone);
-                    _targetTime = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(_targetTime, timeZone.Id);
-                }
-                catch (Exception ex)
-                {
-                    LogWarning(ex.Message);
-                }
-
                 var currentTimespan = new TimeSpan(DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second);
 
                 if (currentTimespan.TotalMilliseconds >= targetTimespan.TotalMilliseconds)

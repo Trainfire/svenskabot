@@ -38,7 +38,6 @@
             public bool IsDebugEnabled { get; set; }
             public string ChannelID { get; set; }
             public string GrodanEmoji { get; set; } = "grodan_boll";
-            public string Timezone { get; set; } = "W. Europe Standard Time";
         }
     }
 }
