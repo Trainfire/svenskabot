@@ -36,6 +36,11 @@ namespace svenskabot
             {
                 var outExamples = new List<string>();
 
+                // Embed values can have a max of 1024 characters.
+                const int lengthLimit = 1024;
+
+                var totalLength = 0;
+
                 for (int i = 0; i < filteredExamples.Count(); i++)
                 {
                     var example = filteredExamples[i];
@@ -48,10 +53,14 @@ namespace svenskabot
                     //  Make ordinal.
                     example = $"{ i + 1 }. { example }.";
 
-                    outExamples.Add(example);
+                    totalLength += example.Length;
+
+                    if (totalLength < lengthLimit)
+                        outExamples.Add(example);
                 }
 
                 outEmbed.AddField("Exempel", string.Join("\n", outExamples));
+
                 outEmbed.AddField("Källa", SourceUrl);
             }
             else
