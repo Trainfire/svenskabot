@@ -2,6 +2,7 @@
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
+using System;
 using System.Threading.Tasks;
 using System.Web;
 
@@ -68,7 +69,14 @@ namespace svenskabot
             {
                 searcher.LastResult.AsEmbeds().ForEach(async e =>
                 {
-                    await ctx.RespondAsync(embed: e);
+                    try
+                    {
+                        await ctx.RespondAsync(embed: e);
+                    }
+                    catch (Exception ex)
+                    {
+                        ctx.Client.DebugLogger.LogMessage(LogLevel.Error, "Command", ex.Message, DateTime.Now);
+                    }
                 });
             }
         }
