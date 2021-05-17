@@ -3,6 +3,7 @@ using DSharpPlus.Entities;
 using HtmlAgilityPack;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace svenskabot
 {
@@ -44,11 +45,11 @@ namespace svenskabot
             get { return $"https://forvo.com/word/{ SearchTerm }/#sv"; }
         }
 
-        protected override ISearchResult ProcessDoc(HtmlDocument htmlDocument)
+        protected override Task<ISearchResult> ProcessDoc(HtmlDocument htmlDocument)
         {
             var isResultValid = !htmlDocument.ParsedText.Contains("The page you are looking for doesn't exist.");
 
-            return new ForvoResult(SearchTerm, SearchUrl, isResultValid);
+            return Task.FromResult<ISearchResult>(new ForvoResult(SearchTerm, SearchUrl, isResultValid));
         }
     }
 }

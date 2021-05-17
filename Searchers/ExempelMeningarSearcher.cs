@@ -3,6 +3,7 @@ using HtmlAgilityPack;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace svenskabot
 {
@@ -82,7 +83,7 @@ namespace svenskabot
             get { return "https://exempelmeningar.se/sv/" + SearchTerm; }
         }
 
-        protected override ISearchResult ProcessDoc(HtmlDocument htmlDocument)
+        protected override Task<ISearchResult> ProcessDoc(HtmlDocument htmlDocument)
         {
             var examples = new List<string>();
 
@@ -106,7 +107,7 @@ namespace svenskabot
                 }
             }
 
-            return new ExempelMeningarResult(examples, SearchUrl, SearchTerm);
+            return Task.FromResult<ISearchResult>(new ExempelMeningarResult(examples, SearchUrl, SearchTerm));
         }
     }
 }

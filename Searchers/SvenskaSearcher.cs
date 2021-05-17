@@ -3,6 +3,8 @@ using HtmlAgilityPack;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
 
 namespace svenskabot
 {
@@ -85,13 +87,13 @@ namespace svenskabot
                     case SvenskaKälla.SAOL: källaOrd = "saol"; break;
                 }
 
-                var url = $"https://svenska.se/tri/f_{ källaOrd }.php?sok={ SearchTerm }";
-                url = url.Replace(' ', '+');
+                var url = $"{ _rootUrl }/{ källaOrd }/?sok={ SearchTerm }&pz=1";
 
                 return url;
             }
         }
 
+        private const string _rootUrl = "http://www.svenska.se";
         private SvenskaKälla _källa;
 
         public SvenskaSearcher(SvenskaKälla källa)
@@ -99,71 +101,114 @@ namespace svenskabot
             _källa = källa;
         }
 
-        protected override ISearchResult ProcessDoc(HtmlDocument htmlDocument)
+        protected override async Task<ISearchResult> ProcessDoc(HtmlDocument htmlDocument)
         {
-            if (!htmlDocument.DocumentNode.InnerHtml.Contains("lemma"))
+            // Is invalid search?
+            if (htmlDocument.DocumentNode.InnerHtml.Contains("gav inga svar"))
                 return new SvenskaSearchResult(SearchTerm);
 
-            var lemmaNodes = htmlDocument.DocumentNode
-                .SelectNodes("//*[@class='lemma']")
+            // Check if the page contains multiple different options, then move onto the first one.
+            // (It doesn't matter which link we choose since they all lead to the same page.)
+            var cshowNode = htmlDocument.DocumentNode
+            .SelectSingleNode("//*[@class='cshow']");
+
+            if (cshowNode != null)
+            {
+                var slankNodes = cshowNode
+                .SelectNodes("./*[@class='slank']")
+                .ToList();
+
+                if (slankNodes != null)
+                {
+                    var firstLink = slankNodes
+                        .First()
+                        .GetAttributeValue("href", string.Empty);
+
+                    if (firstLink != string.Empty)
+                    {
+                        try
+                        {
+                            // Replace htmlDocument with redirect page.
+                            htmlDocument = await LoadFromUrl(_rootUrl + firstLink);
+                        }
+                        catch (WebException ex)
+                        {
+                            return new WebExceptionSearchResult(this, ex);
+                        }
+                    }
+                }
+            }
+
+            var superlemmaNodes = htmlDocument.DocumentNode
+                .SelectNodes("//*[@class='superlemma']")
                 .ToList();
 
             var ordEntries = new List<OrdEntry>();
 
-            foreach (var lemmaNode in lemmaNodes)
+            foreach (var superLemmaNode in superlemmaNodes)
             {
-                var ordEntry = ProcessLemmaNode(lemmaNode);
+                var ordEntry = ProcessSuperLemmaNode(superLemmaNode);
                 ordEntries.Add(ordEntry);
             }
 
-            return new SvenskaSearchResult(SearchTerm, ordEntries);
+            var result = new SvenskaSearchResult(SearchTerm, ordEntries);
+
+            return result;
         }
 
-        private OrdEntry ProcessLemmaNode(HtmlNode htmlNode)
+        private OrdEntry ProcessSuperLemmaNode(HtmlNode superLemmaNode)
         {
             string localParseClass(string className)
             {
-                var node = htmlNode.SelectSingleNode($"./*[@class='{ className }']");
-                return node != null ? node.InnerText : string.Empty;
+                var nodes = superLemmaNode.SelectNodes($".//*[@class='{ className }']");
+                return nodes != null ? string.Join(", ", nodes.ToList().Select(x => x.InnerText)) : string.Empty;
             };
 
-            var grundForm = localParseClass("grundform");
+            var grundForm = localParseClass("orto");
             if (grundForm == string.Empty)
                 grundForm = localParseClass("grundform_ptv");
 
             var ordklass = localParseClass("ordklass");
-            var böjning = localParseClass("bojning");
 
-            var lexemNodes = htmlNode
-                .SelectNodes("./*[@class='lexem']")
+            var böjningar = localParseClass("bojning");
+
+            var lexemDivs = superLemmaNode
+                .SelectNodes("./*[@class='lexemdiv']")
                 .ToList();
 
             var definitions = new List<OrdDefinition>();
 
-            foreach (var lexemNode in lexemNodes)
+            foreach (var lexemDiv in lexemDivs)
             {
-                var definitionNode = lexemNode.SelectSingleNode($".//*[@class='def']");
-                var definitionTNode = lexemNode.SelectSingleNode($".//*[@class='deft']");
+                var lexems = lexemDiv
+                .SelectNodes("./*[@class='lexem']")
+                .ToList();
 
-                var syntexNodes = lexemNode.SelectNodes(".//*[@class='syntex']");
-                var exempel = new List<string>();
-
-                if (syntexNodes != null)
+                foreach (var lexem in lexems)
                 {
-                    syntexNodes
-                        .ToList()
-                        .ForEach(x => exempel.Add(x.InnerText));
+                    var definitionNode = lexem.SelectSingleNode($".//*[@class='def']");
+                    var definitionTNode = lexem.SelectSingleNode($".//*[@class='deft']");
+
+                    var syntexNodes = lexem.SelectNodes(".//*[@class='syntex']");
+                    var exempel = new List<string>();
+
+                    if (syntexNodes != null)
+                    {
+                        syntexNodes
+                            .ToList()
+                            .ForEach(x => exempel.Add(x.InnerText));
+                    }
+
+                    var definitionStr = definitionNode?.InnerText;
+                    var definitionTStr = definitionTNode?.InnerText;
+                    var definition = new OrdDefinition(definitionStr, definitionTStr, exempel);
+
+                    if (definition.IsValid())
+                        definitions.Add(definition);
                 }
-
-                var definitionStr = definitionNode?.InnerText;
-                var definitionTStr = definitionTNode?.InnerText;
-                var definition = new OrdDefinition(definitionStr, definitionTStr, exempel);
-
-                if (definition.IsValid())
-                    definitions.Add(definition);
             }
 
-            return new OrdEntry(grundForm, ordklass, definitions, böjning);
+            return new OrdEntry(grundForm, ordklass, definitions, böjningar);
         }
     }
 }

@@ -36,19 +36,13 @@ namespace svenskabot
         {
             SearchTerm = searchTerm;
 
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(SearchUrl);
-            request.Timeout = 15000;
-            request.Method = "HEAD";
             try
             {
-                using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
-                {
-                    var web = new HtmlWeb();
-                    var doc = await web.LoadFromWebAsync(SearchUrl);
-                    LastResult = ProcessDoc(doc);
+                var doc = await LoadFromUrl(SearchUrl);
 
-                    return SearchResponse.Successful;
-                }
+                LastResult = await ProcessDoc(doc);
+
+                return SearchResponse.Successful;
             }
             catch (WebException ex)
             {
@@ -58,7 +52,19 @@ namespace svenskabot
             }
         }
 
-        protected abstract ISearchResult ProcessDoc(HtmlDocument htmlDocument);
+        protected abstract Task<ISearchResult> ProcessDoc(HtmlDocument htmlDocument);
+
+        protected async Task<HtmlDocument> LoadFromUrl(string url)
+        {
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+            request.Timeout = 15000;
+            request.Method = "HEAD";
+            using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
+            {
+                var web = new HtmlWeb();
+                return await web.LoadFromWebAsync(request.RequestUri.ToString());
+            }
+        }
     }
 
     public class WebExceptionSearchResult : ISearchResult
