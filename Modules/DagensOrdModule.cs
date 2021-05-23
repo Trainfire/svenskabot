@@ -106,7 +106,7 @@ namespace svenskabot
 
                         Entry.AddToBuilder(embed);
 
-                        if (DateTime.Now.DayOfWeek == DayOfWeek.Sunday)
+                        if (DateTime.Now.DayOfWeek == DayOfWeek.Friday)
                         {
                             try
                             {
