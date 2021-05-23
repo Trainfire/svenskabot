@@ -30,9 +30,11 @@ namespace svenskabot
             }
             else
             {
-                outBuilder = _ordEntry.AsEmbed();
+                outBuilder = _ordEntry.AsEmbedBuilder();
                 outBuilder.AddSearchTitle(discordClient, title);
             }
+
+            outBuilder.SetupWithDefaultValues(discordClient);
 
             return new List<DiscordEmbedBuilder>() { outBuilder };
         }

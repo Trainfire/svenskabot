@@ -100,30 +100,27 @@ namespace svenskabot
                     {
                         Log($"Posting to channel: { _discordChannel.Name }");
 
-                        var strings = new List<string>();
+                        var embed = new DiscordEmbedBuilder();
+                        embed.SetupWithDefaultValues(_discordClient);
+                        embed.WithTitle($"{ DiscordEmoji.FromName(_discordClient, ":date:") } Dagens ord");
 
-                        if (DateTime.Now.DayOfWeek == DayOfWeek.Friday)
+                        Entry.AddToBuilder(embed);
+
+                        if (DateTime.Now.DayOfWeek == DayOfWeek.Sunday)
                         {
-                            strings.Add($"God fredag mina bekanta!");
-
-                            DiscordEmoji grodanEmoji = null;
-
                             try
                             {
-                                grodanEmoji = DiscordEmoji.FromName(_discordClient, $":{ Resources.ConstantData.DagensOrd.GrodanEmoji }:");
+                                var grodanEmoji = DiscordEmoji.FromName(_discordClient, $":{ Resources.ConstantData.DagensOrd.GrodanEmoji }:");
+                                embed.AddField("God fredag mina bekanta!", grodanEmoji);
                             }
                             catch
                             {
                                 LogWarning("Could not find emoji...");
                             }
 
-                            if (grodanEmoji != null)
-                                strings.Add($"{ grodanEmoji }");
                         }
 
-                        strings.Add("Dagens ord är...");
-
-                        await _discordChannel.SendMessageAsync(content: string.Join(" ", strings), embed: Entry.AsEmbed());
+                        await _discordChannel.SendMessageAsync(embed: embed);
                     }
 
                     UpdateTargetTime();

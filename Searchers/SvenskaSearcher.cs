@@ -46,7 +46,9 @@ namespace svenskabot
 
                     var outBuilder = new DiscordEmbedBuilder();
 
-                    outBuilder = ordEntry.AsEmbed();
+                    outBuilder = ordEntry.AsEmbedBuilder();
+
+                    outBuilder.SetupWithDefaultValues(discordClient);
 
                     string source;
                     if (count > 1)
@@ -73,7 +75,7 @@ namespace svenskabot
                 {
                     var outBuilder = new DiscordEmbedBuilder();
 
-                    outBuilder.Setup(discordClient);
+                    outBuilder.SetupWithDefaultValues(discordClient);
 
                     outBuilder.AddField(Strings.Warning, $"Det finns { _ordEntries.Count - maxEmbeds } till inlägg som kan ses online.");
 

@@ -29,6 +29,7 @@ namespace svenskabot
         {
             var outEmbed = new DiscordEmbedBuilder();
 
+            outEmbed.SetupWithDefaultValues(discordClient);
             outEmbed.AddSearchTitle(discordClient, "Exempelmeningar");
 
             int maxExamples = Resources.ConstantData.ExempelMeningar.MaxSentences;

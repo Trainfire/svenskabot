@@ -25,6 +25,8 @@ namespace svenskabot
         {
             var outBuilder = new DiscordEmbedBuilder();
 
+            outBuilder.SetupWithDefaultValues(discordClient);
+
             outBuilder.WithTitle(discordClient, "Forvo", ":speaking_head:");
 
             if (_isResultValid)

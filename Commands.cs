@@ -43,7 +43,7 @@ namespace svenskabot
 
             try
             {
-                await ctx.RespondAsync(embed: module.Entry.AsEmbed());
+                await ctx.RespondAsync(embed: module.Entry.AsEmbedBuilder());
             }
             catch (Exception ex)
             {

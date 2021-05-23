@@ -3,6 +3,7 @@ using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
 using System;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace svenskabot
 {
@@ -13,12 +14,27 @@ namespace svenskabot
         public static string ToItalics(this string aString) { return $"*{ aString }*"; }
     }
 
+    public class SvenskaBotDiscordEmbedBuilder : DiscordEmbedBuilder
+    {
+        public SvenskaBotDiscordEmbedBuilder(DiscordClient discordClient)
+        {
+            WithColor(DiscordColor.Green);
+            WithFooter($"Med kärlek från + { discordClient.CurrentUser.Username }", null);
+        }
+    }
+
     public static class DiscordEmbedBuilderEx
     {
         // See here: https://support.discord.com/hc/en-us/community/posts/360056286551--BUG-Infinite-Scroll-Embed-Android-
         public static void HackFixWidth(this DiscordEmbedBuilder discordEmbedBuilder)
         {
             discordEmbedBuilder.WithDescription("------------------------------------------------------");
+        }
+
+        public static void SetupWithDefaultValues(this DiscordEmbedBuilder discordEmbedBuilder, DiscordClient discordClient)
+        {
+            discordEmbedBuilder.WithColor(DiscordColor.Green);
+            discordEmbedBuilder.WithFooter($"Med kärlek från { discordClient.CurrentUser.Username }", null);
         }
 
         public static void WithTitle(this DiscordEmbedBuilder discordEmbedBuilder, DiscordClient discordClient, string title, string emojiString)

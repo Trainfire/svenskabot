@@ -38,20 +38,18 @@ namespace svenskabot
             _definitioner = definitioner ?? new List<OrdDefinition>();
         }
 
-        public DiscordEmbedBuilder AsEmbed()
+        public void AddToBuilder(DiscordEmbedBuilder discordEmbedBuilder)
         {
             int maxDefinitions = Resources.ConstantData.Ord.MaxDefinitions;
 
-            var outBuilder = new DiscordEmbedBuilder();
-
             if (!string.IsNullOrEmpty(Grundform))
-                outBuilder.AddField("Grundform", Grundform);
+                discordEmbedBuilder.AddField("Grundform", Grundform);
 
             if (!string.IsNullOrEmpty(Ordklass))
-                outBuilder.AddField("Ordklass", Ordklass);
+                discordEmbedBuilder.AddField("Ordklass", Ordklass);
 
             if (!string.IsNullOrEmpty(Böjningar))
-                outBuilder.AddField("Böjningar", Böjningar);
+                discordEmbedBuilder.AddField("Böjningar", Böjningar);
 
             int definitionCount = Math.Min(maxDefinitions, Definitioner.Count);
 
@@ -89,15 +87,20 @@ namespace svenskabot
                     definitionString += AddList(examples.ToArray());
                 }
 
-                outBuilder.AddField($"{ (i + 1).ToString() }", definitionString);
+                discordEmbedBuilder.AddField($"{ (i + 1).ToString() }", definitionString);
             }
 
             if (Definitioner.Count > maxDefinitions)
             {
                 var additionalDefinitions = Definitioner.Count - maxDefinitions;
-                outBuilder.AddField("Obs!", $"Det finns { additionalDefinitions.ToString().ToBold() } definitioner till som kan hittas online.");
+                discordEmbedBuilder.AddField("Obs!", $"Det finns { additionalDefinitions.ToString().ToBold() } definitioner till som kan hittas online.");
             }
+        }
 
+        public DiscordEmbedBuilder AsEmbedBuilder()
+        {
+            var outBuilder = new DiscordEmbedBuilder();
+            AddToBuilder(outBuilder);
             return outBuilder;
         }
 
