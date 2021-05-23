@@ -2,11 +2,17 @@
 {
     public class ConstantData
     {
+        public GeneralConfig General { get; set; } = new GeneralConfig();
         public ExternalSources Sources { get; set; } = new ExternalSources();
         public ExempelMeningarConfig ExempelMeningar { get; set; } = new ExempelMeningarConfig();
         public SvenskaSearcherConfig SvenskaSearcher { get; set; } = new SvenskaSearcherConfig();
         public OrdConfig Ord { get; set; } = new OrdConfig();
         public DagensOrdConfig DagensOrd { get; set; } = new DagensOrdConfig();
+
+        public class GeneralConfig
+        {
+            public string OwnerID;
+        }
 
         public class ExternalSources
         {

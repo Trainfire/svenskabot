@@ -19,12 +19,6 @@ namespace svenskabot
             await ctx.RespondAsync(embed: builder);
         }
 
-        [Command("d")]
-        public async Task SearchDeprecated(CommandContext ctx)
-        {
-            await ctx.RespondAsync($"Det här kommandot har tagits bort. Använd { "!so".ToItalics() } eller { "!saol".ToItalics() } istället");
-        }
-
         [Command("so"), Description("Searches SO for the specified word.")]
         public async Task SearchSO(CommandContext ctx) => await SearchAsync(ctx, new SvenskaSearcher(SvenskaKälla.SO));
 
@@ -45,7 +39,14 @@ namespace svenskabot
         {
             var module = ctx.Client.GetModule<DagensOrdModule>();
 
-            await ctx.RespondAsync(embed: module.Entry.AsEmbed());
+            try
+            {
+                await ctx.RespondAsync(embed: module.Entry.AsEmbed());
+            }
+            catch (Exception ex)
+            {
+                await ctx.RespondAsync(ex);
+            }
         }
 
         private async Task SearchAsync(CommandContext ctx, ISearcherAsync searcher)
@@ -63,7 +64,14 @@ namespace svenskabot
             // Show typing response whilst searching.
             await ctx.TriggerTypingAsync();
 
-            await searcher.SearchAsync(searchTerm);
+            try
+            {
+                await searcher.SearchAsync(searchTerm);
+            }
+            catch (Exception ex)
+            {
+                await ctx.RespondAsync(ex);
+            }
 
             if (searcher.LastResult != null)
             {
@@ -76,6 +84,7 @@ namespace svenskabot
                     catch (Exception ex)
                     {
                         ctx.Client.DebugLogger.LogMessage(LogLevel.Error, "Command", ex.Message, DateTime.Now);
+                        await ctx.RespondAsync(ex);
                     }
                 });
             }

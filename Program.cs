@@ -89,4 +89,30 @@ namespace svenskabot
             discordEmbedBuilder.WithDescription("------------------------------------------------------");
         }
     }
+
+    public static class CommandContextEx
+    {
+        public static Task<DiscordMessage> RespondAsync(this CommandContext ctx, Exception exception)
+        {
+            var builder = new DiscordEmbedBuilder();
+
+            var fireEmoji = DiscordEmoji.FromName(ctx.Client, ":fire:");
+            builder.WithTitle($"{ fireEmoji } Exception Thrown { fireEmoji }");
+
+            builder.AddField("Context Message", ctx.Message.Content);
+
+            if (exception.Message != string.Empty)
+                builder.AddField("Exception Message", exception.Message);
+
+            builder.AddField("Stack Track", exception.StackTrace);
+
+            var ownerID = Resources.ConstantData.General.OwnerID;
+            if (ownerID != string.Empty)
+            {
+                builder.WithDescription($"<@{ ownerID }>");
+            }
+
+            return ctx.RespondAsync(embed: builder);
+        }
+    }
 }
