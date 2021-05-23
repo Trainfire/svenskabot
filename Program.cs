@@ -73,46 +73,4 @@ namespace svenskabot
             }
         }
     }
-
-    public static class DiscordTextFormatter
-    {
-        public static string ToBold(this string aString) { return $"**{ aString }**"; }
-        public static string ToBoldAndItalics(this string aString) { return $"***{ aString }***"; }
-        public static string ToItalics(this string aString) { return $"*{ aString }*"; }
-    }
-
-    public static class DiscordEmbedBuilderEx
-    {
-        // See here: https://support.discord.com/hc/en-us/community/posts/360056286551--BUG-Infinite-Scroll-Embed-Android-
-        public static void HackFixWidth(this DiscordEmbedBuilder discordEmbedBuilder)
-        {
-            discordEmbedBuilder.WithDescription("------------------------------------------------------");
-        }
-    }
-
-    public static class CommandContextEx
-    {
-        public static Task<DiscordMessage> RespondAsync(this CommandContext ctx, Exception exception)
-        {
-            var builder = new DiscordEmbedBuilder();
-
-            var fireEmoji = DiscordEmoji.FromName(ctx.Client, ":fire:");
-            builder.WithTitle($"{ fireEmoji } Exception Thrown { fireEmoji }");
-
-            builder.AddField("Context Message", ctx.Message.Content);
-
-            if (exception.Message != string.Empty)
-                builder.AddField("Exception Message", exception.Message);
-
-            builder.AddField("Stack Track", exception.StackTrace);
-
-            var ownerID = Resources.ConstantData.General.OwnerID;
-            if (ownerID != string.Empty)
-            {
-                builder.WithDescription($"<@{ ownerID }>");
-            }
-
-            return ctx.RespondAsync(embed: builder);
-        }
-    }
 }

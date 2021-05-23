@@ -1,4 +1,5 @@
 ﻿
+using DSharpPlus;
 using DSharpPlus.Entities;
 using HtmlAgilityPack;
 using System.Collections.Generic;
@@ -20,18 +21,19 @@ namespace svenskabot
             _isResultValid = isResultValid;
         }
 
-        public List<DiscordEmbedBuilder> AsEmbeds()
+        public List<DiscordEmbedBuilder> AsEmbeds(DiscordClient discordClient)
         {
             var outBuilder = new DiscordEmbedBuilder();
-            outBuilder.HackFixWidth();
+
+            outBuilder.WithTitle(discordClient, "Forvo", ":speaking_head:");
 
             if (_isResultValid)
             {
-                outBuilder.AddField($"Uttal för ordet '{ _searchTerm }' på Forvo", _searchUrl);
+                outBuilder.WithDescription(_searchUrl);
             }
             else
             {
-                outBuilder.AddField("Inga result hittades på Forvo för", _searchTerm);
+                outBuilder.WithDescription(Strings.NoResultFound);
             }
 
             return new List<DiscordEmbedBuilder>() { outBuilder };

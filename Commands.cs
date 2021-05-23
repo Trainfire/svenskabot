@@ -22,14 +22,16 @@ namespace svenskabot
         [Command("so"), Description("Searches SO for the specified word.")]
         public async Task SearchSO(CommandContext ctx) => await SearchAsync(ctx, new SvenskaSearcher(SvenskaKälla.SO));
 
-        [Command("saol"), Description("Searches SAOL for the specified word.")]
-        public async Task SearchSAOL(CommandContext ctx) => await SearchAsync(ctx, new SvenskaSearcher(SvenskaKälla.SAOL));
+        // TODO: Update SAOL to support 2021 changes.
+        //[Command("saol"), Description("Searches SAOL for the specified word.")]
+        //public async Task SearchSAOL(CommandContext ctx) => await SearchAsync(ctx, new SvenskaSearcher(SvenskaKälla.SAOL));
 
         [Command("examples"), Description("Searches exempelmeningar.se for the specified word."), Aliases("e", "exempel")]
         public async Task SearchExempelMeningar(CommandContext ctx) => await SearchAsync(ctx, new ExempelMeningarSearcher());
 
-        [Command("uttal"), Description("Searches forvo.com for the specified word."), Aliases("u")]
-        public async Task SearchForvo(CommandContext ctx) => await SearchAsync(ctx, new ForvoSearcher());
+        // TODO: Need a better way of handling invalid search results.
+        //[Command("uttal"), Description("Searches forvo.com for the specified word."), Aliases("u")]
+        //public async Task SearchForvo(CommandContext ctx) => await SearchAsync(ctx, new ForvoSearcher());
 
         [Command("folkets")]
         public async Task SearchFolketsOrdbok(CommandContext ctx) => await SearchAsync(ctx, new FolketsOrdbokSearcher());
@@ -75,7 +77,7 @@ namespace svenskabot
 
             if (searcher.LastResult != null)
             {
-                searcher.LastResult.AsEmbeds().ForEach(async e =>
+                searcher.LastResult.AsEmbeds(ctx.Client).ForEach(async e =>
                 {
                     try
                     {

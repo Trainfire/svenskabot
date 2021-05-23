@@ -1,4 +1,5 @@
-﻿using DSharpPlus.Entities;
+﻿using DSharpPlus;
+using DSharpPlus.Entities;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -15,20 +16,25 @@ namespace svenskabot
             _ordEntry = ordEntry;
         }
 
-        public List<DiscordEmbedBuilder> AsEmbeds()
+        public List<DiscordEmbedBuilder> AsEmbeds(DiscordClient discordClient)
         {
+            DiscordEmbedBuilder outBuilder;
+
+            var title = "Folkets Lexicon";
+
             if (_ordEntry == null)
             {
-                var outBuilder = new DiscordEmbedBuilder();
-                outBuilder.HackFixWidth();
-                outBuilder.AddField("Inga result hittades i Folketsordbok för", _searchTerm);
-
-                return new List<DiscordEmbedBuilder>() { outBuilder };
+                outBuilder = new DiscordEmbedBuilder();
+                outBuilder.AddSearchTitle(discordClient, title);
+                outBuilder.WithDescription(Strings.NoResultFound);
             }
             else
             {
-                return new List<DiscordEmbedBuilder>() { _ordEntry.AsEmbed() };
+                outBuilder = _ordEntry.AsEmbed();
+                outBuilder.AddSearchTitle(discordClient, title);
             }
+
+            return new List<DiscordEmbedBuilder>() { outBuilder };
         }
     }
 

@@ -1,4 +1,5 @@
-﻿using DSharpPlus.Entities;
+﻿using DSharpPlus;
+using DSharpPlus.Entities;
 using HtmlAgilityPack;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,10 +25,11 @@ namespace svenskabot
             SearchTerm = searchTerm;
         }
 
-        public List<DiscordEmbedBuilder> AsEmbeds()
+        public List<DiscordEmbedBuilder> AsEmbeds(DiscordClient discordClient)
         {
             var outEmbed = new DiscordEmbedBuilder();
-            outEmbed.HackFixWidth();
+
+            outEmbed.AddSearchTitle(discordClient, "Exempelmeningar");
 
             int maxExamples = Resources.ConstantData.ExempelMeningar.MaxSentences;
 
@@ -62,11 +64,11 @@ namespace svenskabot
 
                 outEmbed.AddField("Exempel", string.Join("\n", outExamples));
 
-                outEmbed.AddField("Källa", SourceUrl);
+                outEmbed.AddField(Strings.Source, SourceUrl);
             }
             else
             {
-                outEmbed.AddField("Exempel", "Inga exempel hittades.");
+                outEmbed.WithDescription(Strings.NoResultFound);
             }
 
             var outEmbeds = new List<DiscordEmbedBuilder>();

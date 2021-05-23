@@ -1,4 +1,5 @@
-﻿using DSharpPlus.Entities;
+﻿using DSharpPlus;
+using DSharpPlus.Entities;
 using HtmlAgilityPack;
 using System;
 using System.Collections.Generic;
@@ -12,23 +13,26 @@ namespace svenskabot
     {
         public IReadOnlyList<OrdEntry> OrdEntries { get { return _ordEntries; } }
 
-        private List<OrdEntry> _ordEntries = new List<OrdEntry>();
+        private SvenskaKälla _källa;
         private string _searchTerm;
+        private List<OrdEntry> _ordEntries = new List<OrdEntry>();
 
-        public SvenskaSearchResult(string searchTerm, List<OrdEntry> ordEntries = null)
+        public SvenskaSearchResult(SvenskaKälla källa, string searchTerm, List<OrdEntry> ordEntries = null)
         {
+            _källa = källa;
             _searchTerm = searchTerm;
             _ordEntries = ordEntries;
         }
 
-        public List<DiscordEmbedBuilder> AsEmbeds()
+        public List<DiscordEmbedBuilder> AsEmbeds(DiscordClient discordClient)
         {
             var outBuilders = new List<DiscordEmbedBuilder>();
 
             if (_ordEntries == null)
             {
                 var outBuilder = new DiscordEmbedBuilder();
-                outBuilder.AddField("No result found for", _searchTerm);
+                outBuilder.AddSearchTitle(discordClient, _källa.ToString());
+                outBuilder.WithDescription(Strings.NoResultFound);
                 outBuilders.Add(outBuilder);
             }
             else
@@ -42,13 +46,24 @@ namespace svenskabot
 
                     var outBuilder = new DiscordEmbedBuilder();
                     outBuilder = ordEntry.AsEmbed();
-                    outBuilder.HackFixWidth();
+
+                    string source;
+                    if (count > 1)
+                    {
+                        source = $"{ _källa.ToString() } - { i + 1 }/{ count }";
+                    }
+                    else
+                    {
+                        source = _källa.ToString();
+                    }
+
+                    outBuilder.AddSearchTitle(discordClient, source);
 
                     // NB: The url for viewing the source is different from the one used for parsing the entry.
                     var sourceUrl = $"https://svenska.se/tre/?sok={ ordEntry.Grundform }&pz=1";
                     sourceUrl = sourceUrl.Replace(" ", "+");
 
-                    outBuilder.AddField("Källa", sourceUrl);
+                    outBuilder.AddField(Strings.Source, sourceUrl);
 
                     outBuilders.Add(outBuilder);
                 }
@@ -57,7 +72,7 @@ namespace svenskabot
                 {
                     var outBuilder = new DiscordEmbedBuilder();
 
-                    outBuilder.AddField("Obs", $"Det finns { _ordEntries.Count - maxEmbeds } till inlägg som kan ses online.");
+                    outBuilder.AddField(Strings.Warning, $"Det finns { _ordEntries.Count - maxEmbeds } till inlägg som kan ses online.");
 
                     outBuilders.Add(outBuilder);
                 }
@@ -105,7 +120,7 @@ namespace svenskabot
         {
             // Is invalid search?
             if (htmlDocument.DocumentNode.InnerHtml.Contains("gav inga svar"))
-                return new SvenskaSearchResult(SearchTerm);
+                return new SvenskaSearchResult(_källa, SearchTerm);
 
             // Check if the page contains multiple different options, then move onto the first one.
             // (It doesn't matter which link we choose since they all lead to the same page.)
@@ -151,7 +166,7 @@ namespace svenskabot
                 ordEntries.Add(ordEntry);
             }
 
-            var result = new SvenskaSearchResult(SearchTerm, ordEntries);
+            var result = new SvenskaSearchResult(_källa, SearchTerm, ordEntries);
 
             return result;
         }

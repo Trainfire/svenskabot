@@ -1,16 +1,16 @@
-﻿using DSharpPlus.Entities;
+﻿using DSharpPlus;
+using DSharpPlus.Entities;
 using HtmlAgilityPack;
 using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
-using System.Web;
 
 namespace svenskabot
 {
     public interface ISearchResult
     {
-        public List<DiscordEmbedBuilder> AsEmbeds();
+        public List<DiscordEmbedBuilder> AsEmbeds(DiscordClient discordClient);
     }
 
     public enum SearchResponse
@@ -78,13 +78,16 @@ namespace svenskabot
             _webException = webException;
         }
 
-        public List<DiscordEmbedBuilder> AsEmbeds()
+        public List<DiscordEmbedBuilder> AsEmbeds(DiscordClient discordClient)
         {
             var embedBuilder = new DiscordEmbedBuilder();
 
             var uri = new Uri(_searcher.SearchUrl);
 
-            embedBuilder.AddField("Åh nej.", $"Något gick fel med { uri.Host } ({ _webException.Status })");
+            embedBuilder.WithTitle(discordClient, "Web Exception", ":warning:");
+            embedBuilder.AddField("URL", uri.OriginalString);
+            embedBuilder.AddField("Exception", _webException.Message);
+            embedBuilder.AddField("Status", _webException.Status.ToString());
 
             return new List<DiscordEmbedBuilder>() { embedBuilder };
         }
