@@ -59,19 +59,37 @@ namespace svenskabot
             {
                 var definitionEntry = Definitioner[i];
 
-                var definitionString = definitionEntry.Definition;
+                string definitionString = string.Empty;
+
+                definitionString += AddHeader("Definition");
+                definitionString += definitionEntry.Definition;
+
                 if (!string.IsNullOrEmpty(definitionEntry.DefinitionT))
+                {
                     definitionString += $" ({ definitionEntry.DefinitionT })";
+                }
+
+                definitionString += AddLineBreak();
+
+                if (!string.IsNullOrEmpty(definitionEntry.Konstruktion))
+                {
+                    definitionString += AddHeader("Konstruktion");
+                    definitionString += AddList(definitionEntry.Konstruktion.Trim().Split("\n"));
+                }
+
+                definitionString += AddLineBreak();
 
                 var examples = definitionEntry.Exempel
                     .Take(Resources.ConstantData.Ord.MaxExamplesPerDefinition)
                     .ToList();
 
-                // Make one string with line breaks since it takes less room than a header for each example.
                 if (examples.Count() != 0)
-                    examples.ForEach(example => definitionString += "\n- " + example.ToItalics());
+                {
+                    definitionString += AddHeader("Exampel");
+                    definitionString += AddList(examples.ToArray());
+                }
 
-                outBuilder.AddField($"Definition { (i + 1).ToString() }", definitionString);
+                outBuilder.AddField($"{ (i + 1).ToString() }", definitionString);
             }
 
             if (Definitioner.Count > maxDefinitions)
@@ -82,18 +100,34 @@ namespace svenskabot
 
             return outBuilder;
         }
+
+        string AddHeader(string header)
+        {
+            return $"{ header }: ".ToBold();
+        }
+
+        string AddList(string[] strings)
+        {
+            return string.Join("; ", strings);
+        }
+
+        string AddLineBreak()
+        {
+            return "\n";
+        }
     }
 
     class OrdDefinitionBuilder
     {
         public OrdDefinition AsNew()
         {
-            return new OrdDefinition(Definition, DefinitionT, Exempel);
+            return new OrdDefinition(Definition, DefinitionT, Exempel, Konstruktion);
         }
 
         public string Definition { get; set; }
         public string DefinitionT { get; set; }
         public List<string> Exempel { get; set; } = new List<string>();
+        public string Konstruktion { get; set; }
     }
 
     public class OrdDefinition
@@ -101,14 +135,16 @@ namespace svenskabot
         public string Definition { get; private set; }
         public string DefinitionT { get; private set; }
         public IReadOnlyList<string> Exempel { get { return _exempel; } }
+        public string Konstruktion { get; private set; }
 
         private List<string> _exempel { get; set; } = new List<string>();
 
-        public OrdDefinition(string definition, string definitionT, List<string> exempel)
+        public OrdDefinition(string definition, string definitionT, List<string> exempel, string konstruktion)
         {
             Definition = definition ?? string.Empty;
             DefinitionT = definitionT ?? string.Empty;
             _exempel = exempel ?? new List<string>();
+            Konstruktion = konstruktion ?? string.Empty;
         }
 
         public bool IsValid()

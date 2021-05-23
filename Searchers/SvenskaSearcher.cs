@@ -45,6 +45,7 @@ namespace svenskabot
                     var ordEntry = _ordEntries[i];
 
                     var outBuilder = new DiscordEmbedBuilder();
+
                     outBuilder = ordEntry.AsEmbed();
 
                     string source;
@@ -71,6 +72,8 @@ namespace svenskabot
                 if (_ordEntries.Count > maxEmbeds)
                 {
                     var outBuilder = new DiscordEmbedBuilder();
+
+                    outBuilder.Setup(discordClient);
 
                     outBuilder.AddField(Strings.Warning, $"Det finns { _ordEntries.Count - maxEmbeds } till inlägg som kan ses online.");
 
@@ -203,6 +206,7 @@ namespace svenskabot
                 {
                     var definitionNode = lexem.SelectSingleNode($".//*[@class='def']");
                     var definitionTNode = lexem.SelectSingleNode($".//*[@class='deft']");
+                    var konstruktionNode = lexem.SelectSingleNode($".//*[@class='valens']");
 
                     var syntexNodes = lexem.SelectNodes(".//*[@class='syntex']");
                     var exempel = new List<string>();
@@ -216,7 +220,9 @@ namespace svenskabot
 
                     var definitionStr = definitionNode?.InnerText;
                     var definitionTStr = definitionTNode?.InnerText;
-                    var definition = new OrdDefinition(definitionStr, definitionTStr, exempel);
+                    var konstruktion = konstruktionNode?.InnerText;
+
+                    var definition = new OrdDefinition(definitionStr, definitionTStr, exempel, konstruktion);
 
                     if (definition.IsValid())
                         definitions.Add(definition);
