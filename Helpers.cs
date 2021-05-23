@@ -33,7 +33,23 @@ namespace svenskabot
 
         public static void SetupWithDefaultValues(this DiscordEmbedBuilder discordEmbedBuilder, DiscordClient discordClient)
         {
-            discordEmbedBuilder.WithColor(DiscordColor.Green);
+            foreach (var guild in discordClient.Guilds)
+            {
+                foreach (var member in guild.Value.Members)
+                {
+                    if (member.Id == discordClient.CurrentUser.Id)
+                    {
+                        if (member.Roles.Count() != 0)
+                        {
+                            var role = member.Roles.First();
+                            discordEmbedBuilder.WithColor(role.Color);
+                        }
+
+                        return;
+                    }
+                }
+            }
+
             discordEmbedBuilder.WithFooter($"Med kärlek från { discordClient.CurrentUser.Username }", null);
         }
 
