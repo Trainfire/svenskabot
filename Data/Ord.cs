@@ -83,7 +83,7 @@ namespace svenskabot
 
                 if (examples.Count() != 0)
                 {
-                    definitionString += AddHeader("Exampel");
+                    definitionString += AddHeader("Exempel");
                     definitionString += AddList(examples.ToArray());
                 }
 
