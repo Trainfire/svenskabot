@@ -73,9 +73,8 @@ namespace svenskabot
                 {
                     definitionString += AddHeader("Konstruktion");
                     definitionString += AddList(definitionEntry.Konstruktion.Trim().Split("\n"));
+                    definitionString += AddLineBreak();
                 }
-
-                definitionString += AddLineBreak();
 
                 var examples = definitionEntry.Exempel
                     .Take(Resources.ConstantData.Ord.MaxExamplesPerDefinition)
