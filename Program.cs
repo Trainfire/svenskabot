@@ -58,7 +58,9 @@ namespace svenskabot
             }
             else
             {
-                Console.WriteLine("Please enter a token:");
+                Console.WriteLine("No token found.");
+                Console.WriteLine("If you don't have one, you can find information about creating one at: https://discord.com/developers/docs/topics/oauth2#bots");
+                Console.WriteLine("Otherwise enter it now:");
 
                 var token = Console.ReadLine();
 
