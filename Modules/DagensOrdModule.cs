@@ -16,6 +16,7 @@ namespace svenskabot
 
         private string Path { get; } = AppDomain.CurrentDomain.BaseDirectory + FileName;
         private const string FileName = "dagensord";
+        private const int MinDelayBetweenSearches = 1000;
 
         private DiscordClient _discordClient;
         private DiscordChannel _discordChannel;
@@ -194,7 +195,7 @@ namespace svenskabot
                         }
                         else
                         {
-                            var delay = Resources.ConstantData.DagensOrd.MSDelayBetweenSearches;
+                            var delay = Math.Max(MinDelayBetweenSearches, Resources.ConstantData.DagensOrd.MSDelayBetweenSearches);
 
                             Log($"Failed to fetch entry from SO. Trying again in { delay }ms...");
 

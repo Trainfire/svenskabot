@@ -40,7 +40,7 @@
         {
             public int AnnounceHour { get; set; }
             public int AnnounceMinute { get; set; }
-            public int MSDelayBetweenSearches { get; set; }
+            public int MSDelayBetweenSearches { get; set; } = 1000;
             public bool IsDebugEnabled { get; set; }
             public string ChannelID { get; set; }
             public string GrodanEmoji { get; set; } = "grodan_boll";
