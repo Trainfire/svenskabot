@@ -1,6 +1,7 @@
 ﻿using DSharpPlus;
 using DSharpPlus.Entities;
 using HtmlAgilityPack;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -34,7 +35,20 @@ namespace svenskabot
 
             int maxExamples = Resources.ConstantData.ExempelMeningar.MaxSentences;
 
-            var filteredExamples = (maxExamples > 0 ? Examples.Take(maxExamples) : Examples).ToList();
+            var filteredExamples = new List<string>();
+
+            if (Examples.Count() != 0)
+            {
+                float sample = Math.Max(1, Examples.Count() / (float)maxExamples);
+
+                for (int i = 0; i < Math.Min(maxExamples, Examples.Count() - 1); i++)
+                {
+                    int sampleIndex = (int)Math.Ceiling(i * sample);
+                    sampleIndex = (int)MathF.Min(sampleIndex, Examples.Count() - 1);
+
+                    filteredExamples.Add(Examples[sampleIndex]);
+                }
+            }
 
             if (filteredExamples.Count() != 0)
             {
