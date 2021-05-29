@@ -9,7 +9,7 @@ namespace svenskabot
 {
     public static class Resources
     {
-        public static ConstantData ConstantData { get; private set; }
+        public static ConstantData ConstantData { get; private set; } = new ConstantData();
         public static RuntimeData RuntimeData { get; private set; } = new RuntimeData();
 
         private static string ConfigPath { get { return AppDomain.CurrentDomain.BaseDirectory + "config"; } }
