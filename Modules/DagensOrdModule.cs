@@ -106,12 +106,12 @@ namespace svenskabot
 
                         Entry.AddToBuilder(embed);
 
-                        if (DateTime.Now.DayOfWeek == DayOfWeek.Friday)
+                        if (DateTime.Now.DayOfWeek == DayOfWeek.Saturday)
                         {
                             try
                             {
                                 var grodanEmoji = DiscordEmoji.FromName(_discordClient, $":{ Resources.ConstantData.DagensOrd.GrodanEmoji }:");
-                                embed.AddField("God fredag mina bekanta!", grodanEmoji);
+                                embed.AddField(Strings.FredagMessage, grodanEmoji);
                             }
                             catch
                             {
