@@ -206,25 +206,33 @@ namespace svenskabot
 
                 foreach (var lexem in lexems)
                 {
-                    var definitionNode = lexem.SelectSingleNode($".//*[@class='def']");
-                    var definitionTNode = lexem.SelectSingleNode($".//*[@class='deft']");
-                    var konstruktionNode = lexem.SelectSingleNode($".//*[@class='valens']");
+                    var ordDefinitionBuilder = new OrdDefinitionBuilder();
+
+                    ordDefinitionBuilder.Definition = lexem.SelectSingleNode($".//*[@class='def']")?.InnerText;
+                    ordDefinitionBuilder.DefinitionT = lexem.SelectSingleNode($".//*[@class='deft']")?.InnerText;
 
                     var syntexNodes = lexem.SelectNodes(".//*[@class='syntex']");
-                    var exempel = new List<string>();
-
                     if (syntexNodes != null)
                     {
                         syntexNodes
                             .ToList()
-                            .ForEach(x => exempel.Add(x.InnerText));
+                            .ForEach(x => ordDefinitionBuilder.Exempel.Add(x.InnerText));
                     }
 
-                    var definitionStr = definitionNode?.InnerText;
-                    var definitionTStr = definitionTNode?.InnerText;
-                    var konstruktion = konstruktionNode?.InnerText;
+                    var valens = lexem.SelectSingleNode($".//*[@class='valens']");
+                    if (valens != null)
+                    {
+                        var vtNodes = valens.SelectNodes($".//*[@class='vt']");
 
-                    var definition = new OrdDefinition(definitionStr, definitionTStr, exempel, konstruktion);
+                        if (vtNodes != null)
+                        {
+                            vtNodes
+                            .ToList()
+                            .ForEach(x => ordDefinitionBuilder.Konstruktion.Add(x.InnerText));
+                        }
+                    }
+
+                    var definition = ordDefinitionBuilder.AsNew();
 
                     if (definition.IsValid())
                         definitions.Add(definition);

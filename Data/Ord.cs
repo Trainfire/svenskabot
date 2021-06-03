@@ -69,10 +69,10 @@ namespace svenskabot
 
                 definitionString += AddLineBreak();
 
-                if (!string.IsNullOrEmpty(definitionEntry.Konstruktion))
+                if (definitionEntry.Konstruktion.Count() != 0)
                 {
                     definitionString += AddHeader("Konstruktion");
-                    definitionString += AddList(definitionEntry.Konstruktion.Trim().Split("\n"));
+                    definitionString += AddList(definitionEntry.Konstruktion.ToArray());
                     definitionString += AddLineBreak();
                 }
 
@@ -129,7 +129,7 @@ namespace svenskabot
         public string Definition { get; set; }
         public string DefinitionT { get; set; }
         public List<string> Exempel { get; set; } = new List<string>();
-        public string Konstruktion { get; set; }
+        public List<string> Konstruktion { get; set; } = new List<string>();
     }
 
     public class OrdDefinition
@@ -137,16 +137,16 @@ namespace svenskabot
         public string Definition { get; private set; }
         public string DefinitionT { get; private set; }
         public IReadOnlyList<string> Exempel { get { return _exempel; } }
-        public string Konstruktion { get; private set; }
+        public List<string> Konstruktion { get; private set; }
 
         private List<string> _exempel { get; set; } = new List<string>();
 
-        public OrdDefinition(string definition, string definitionT, List<string> exempel, string konstruktion)
+        public OrdDefinition(string definition, string definitionT, List<string> exempel, List<string> konstruktion)
         {
             Definition = definition ?? string.Empty;
             DefinitionT = definitionT ?? string.Empty;
             _exempel = exempel ?? new List<string>();
-            Konstruktion = konstruktion ?? string.Empty;
+            Konstruktion = konstruktion ?? new List<string>();
         }
 
         public bool IsValid()
