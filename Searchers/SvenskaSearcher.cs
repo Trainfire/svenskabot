@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace svenskabot
 {
-    class SvenskaSearchResult : ISearchResult
+    class SvenskaSearchResult : ISearcherResult
     {
         public IReadOnlyList<OrdEntry> OrdEntries { get { return _ordEntries; } }
 
@@ -24,7 +24,7 @@ namespace svenskabot
             _ordEntries = ordEntries;
         }
 
-        public List<DiscordEmbedBuilder> AsEmbeds(DiscordClient discordClient)
+        public List<DiscordEmbedBuilder> GetEmbedsFromSearchResult(DiscordClient discordClient)
         {
             var outBuilders = new List<DiscordEmbedBuilder>();
 
@@ -93,7 +93,7 @@ namespace svenskabot
         SAOL,
     }
 
-    public class SvenskaSearcher : Searcher
+    public class SvenskaSearcher : WebscrappingSearcher
     {
         public override string SearchUrl
         {
@@ -121,7 +121,7 @@ namespace svenskabot
             _källa = källa;
         }
 
-        protected override async Task<ISearchResult> ProcessDoc(HtmlDocument htmlDocument)
+        protected override async Task<ISearcherResult> ProcessHtmlDocument(HtmlDocument htmlDocument)
         {
             // Is invalid search?
             if (htmlDocument.DocumentNode.InnerHtml.Contains("gav inga svar"))

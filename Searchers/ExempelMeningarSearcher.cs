@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace svenskabot
 {
-    class ExempelMeningarResult : ISearchResult
+    class ExempelMeningarResult : ISearcherResult
     {
         public IReadOnlyList<string> Examples { get { return _examples; } }
         public string SourceUrl { get; private set; }
@@ -26,7 +26,7 @@ namespace svenskabot
             SearchTerm = searchTerm;
         }
 
-        public List<DiscordEmbedBuilder> AsEmbeds(DiscordClient discordClient)
+        public List<DiscordEmbedBuilder> GetEmbedsFromSearchResult(DiscordClient discordClient)
         {
             var outEmbed = new DiscordEmbedBuilder();
 
@@ -93,14 +93,14 @@ namespace svenskabot
         }
     }
 
-    class ExempelMeningarSearcher : Searcher
+    class ExempelMeningarSearcher : WebscrappingSearcher
     {
         public override string SearchUrl
         {
             get { return "https://exempelmeningar.se/sv/" + SearchTerm; }
         }
 
-        protected override Task<ISearchResult> ProcessDoc(HtmlDocument htmlDocument)
+        protected override Task<ISearcherResult> ProcessHtmlDocument(HtmlDocument htmlDocument)
         {
             var examples = new List<string>();
 
@@ -124,7 +124,7 @@ namespace svenskabot
                 }
             }
 
-            return Task.FromResult<ISearchResult>(new ExempelMeningarResult(examples, SearchUrl, SearchTerm));
+            return Task.FromResult<ISearcherResult>(new ExempelMeningarResult(examples, SearchUrl, SearchTerm));
         }
     }
 }

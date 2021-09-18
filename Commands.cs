@@ -4,7 +4,6 @@ using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using System;
 using System.Threading.Tasks;
-using System.Web;
 
 namespace svenskabot
 {
@@ -66,18 +65,20 @@ namespace svenskabot
             // Show typing response whilst searching.
             await ctx.TriggerTypingAsync();
 
+            ISearcherResult result = null;
+
             try
             {
-                await searcher.SearchAsync(searchTerm);
+                result = await searcher.SearchAsync(searchTerm);
             }
             catch (Exception ex)
             {
                 await ctx.RespondAsync(ex);
             }
 
-            if (searcher.LastResult != null)
+            if (result != null)
             {
-                searcher.LastResult.AsEmbeds(ctx.Client).ForEach(async e =>
+                result.GetEmbedsFromSearchResult(ctx.Client).ForEach(async e =>
                 {
                     try
                     {

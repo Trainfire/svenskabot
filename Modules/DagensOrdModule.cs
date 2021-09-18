@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -167,13 +165,11 @@ namespace svenskabot
 
                 var searcher = new SvenskaSearcher(SvenskaKälla.SO);
 
-                var searcherTask = searcher.SearchAsync(Entry.Grundform);
+                await searcher.SearchAsync(Entry.Grundform);
 
-                await searcherTask;
-
-                if (searcherTask.Result == SearchResponse.WebException)
+                if (searcher.LastResponse == WebscrappingSearcherResponse.WebException)
                 {
-                    var timespan = TimeSpan.FromMinutes(5);
+                    var timespan = Resources.ConstantData.DagensOrd.IsDebugEnabled ? TimeSpan.FromSeconds(5) : TimeSpan.FromMinutes(5);
 
                     LogWarning($"Received a WebException. Will try again in { timespan.TotalSeconds } seconds.");
 
@@ -181,7 +177,7 @@ namespace svenskabot
                 }
                 else
                 {
-                    if (searcherTask.Result == SearchResponse.Successful)
+                    if (searcher.LastResponse == WebscrappingSearcherResponse.Successful)
                     {
                         var convertedResult = (SvenskaSearchResult)searcher.LastResult;
 

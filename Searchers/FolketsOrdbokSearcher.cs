@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace svenskabot
 {
-    class FolketsOrdbokResult : ISearchResult
+    class FolketsOrdbokResult : ISearcherResult
     {
         private string _searchTerm;
         private OrdEntry _ordEntry;
@@ -16,7 +16,7 @@ namespace svenskabot
             _ordEntry = ordEntry;
         }
 
-        public List<DiscordEmbedBuilder> AsEmbeds(DiscordClient discordClient)
+        public List<DiscordEmbedBuilder> GetEmbedsFromSearchResult(DiscordClient discordClient)
         {
             DiscordEmbedBuilder outBuilder;
 
@@ -44,9 +44,9 @@ namespace svenskabot
     {
         public string SearchTerm { get; private set; }
 
-        public ISearchResult LastResult { get; private set; }
+        public ISearcherResult LastResult { get; private set; }
 
-        public async Task<SearchResponse> SearchAsync(string searchTerm)
+        public async Task<ISearcherResult> SearchAsync(string searchTerm)
         {
             await Task.Run(() =>
             {
@@ -63,7 +63,7 @@ namespace svenskabot
                 LastResult = new FolketsOrdbokResult(searchTerm, foundWord);
             });
 
-            return SearchResponse.Successful;
+            return LastResult;
         }
     }
 }
