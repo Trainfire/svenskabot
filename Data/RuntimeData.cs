@@ -1,6 +1,4 @@
-﻿using FolketsOrdbokResource;
-
-namespace svenskabot
+﻿namespace svenskabot
 {
     public class RuntimeData
     {

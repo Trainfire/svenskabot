@@ -1,11 +1,10 @@
 ﻿using System.Xml.Serialization;
 using System.Collections.Generic;
 using System;
-using svenskabot;
 using System.IO;
 using System.Net;
 
-namespace FolketsOrdbokResource
+namespace svenskabot
 {
     [XmlRoot(ElementName = "dictionary")]
 	public class FolketsOrdbokSource
