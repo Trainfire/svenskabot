@@ -14,13 +14,11 @@ namespace svenskabot
         public IReadOnlyList<OrdEntry> OrdEntries { get { return _ordEntries; } }
 
         private SvenskaKälla _källa;
-        private string _searchTerm;
         private List<OrdEntry> _ordEntries = new List<OrdEntry>();
 
-        public SvenskaSearchResult(SvenskaKälla källa, string searchTerm, List<OrdEntry> ordEntries = null)
+        public SvenskaSearchResult(SvenskaKälla källa, List<OrdEntry> ordEntries = null)
         {
             _källa = källa;
-            _searchTerm = searchTerm;
             _ordEntries = ordEntries;
         }
 
@@ -120,7 +118,7 @@ namespace svenskabot
         {
             // Is invalid search?
             if (htmlDocument.DocumentNode.InnerHtml.Contains("gav inga svar"))
-                return new SvenskaSearchResult(_källa, SearchTerm);
+                return new SvenskaSearchResult(_källa);
 
             // Check if the page contains multiple different options, then move onto the first one.
             // (It doesn't matter which link we choose since they all lead to the same page.)
@@ -166,7 +164,7 @@ namespace svenskabot
                 ordEntries.Add(ordEntry);
             }
 
-            var result = new SvenskaSearchResult(_källa, SearchTerm, ordEntries);
+            var result = new SvenskaSearchResult(_källa, ordEntries);
 
             return result;
         }
