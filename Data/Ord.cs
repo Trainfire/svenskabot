@@ -42,14 +42,9 @@ namespace svenskabot
         {
             int maxDefinitions = Resources.ConstantData.Ord.MaxDefinitions;
 
-            if (!string.IsNullOrEmpty(Grundform))
-                discordEmbedBuilder.AddField("Grundform", Grundform);
-
-            if (!string.IsNullOrEmpty(Ordklass))
-                discordEmbedBuilder.AddField("Ordklass", Ordklass);
-
-            if (!string.IsNullOrEmpty(Böjningar))
-                discordEmbedBuilder.AddField("Böjningar", Böjningar);
+            discordEmbedBuilder.AddFieldSafe("Grundform", Grundform);
+            discordEmbedBuilder.AddFieldSafe("Ordklass", Ordklass);
+            discordEmbedBuilder.AddFieldSafe("Böjningar", Böjningar);
 
             int definitionCount = Math.Min(maxDefinitions, Definitioner.Count);
 

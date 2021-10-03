@@ -60,6 +60,15 @@ namespace svenskabot
             discordEmbedBuilder.WithTitle($"{ emoji } { title }");
         }
 
+        /// <summary>
+        /// Checks if name and value are both valid before calling AddField.
+        /// </summary>
+        public static void AddFieldSafe(this DiscordEmbedBuilder discordEmbedBuilder, string name, string value, bool inline = false)
+        {
+            if (!string.IsNullOrWhiteSpace(name) && !string.IsNullOrWhiteSpace(value))
+                discordEmbedBuilder.AddField(name, value, inline);
+        }
+
         public static void AddSearchTitle(this DiscordEmbedBuilder discordEmbedBuilder, DiscordClient discordClient, string source = "")
         {
             var emoji = DiscordEmoji.FromName(discordClient, ":mag:");
