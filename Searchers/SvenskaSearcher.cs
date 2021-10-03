@@ -62,12 +62,6 @@ namespace svenskabot
 
                     outBuilder.AddSearchTitle(discordClient, source);
 
-                    // NB: The url for viewing the source is different from the one used for parsing the entry.
-                    var sourceUrl = $"https://svenska.se/tre/?sok={ ordEntry.Grundform }&pz=1";
-                    sourceUrl = sourceUrl.Replace(" ", "+");
-
-                    outBuilder.AddField(Strings.Source, sourceUrl);
-
                     outBuilders.Add(outBuilder);
                 }
 
@@ -239,7 +233,7 @@ namespace svenskabot
                 }
             }
 
-            return new OrdEntry(grundForm, ordklass, definitions, böjningar);
+            return new OrdEntry(grundForm, ordklass, definitions, böjningar, SearchUrl);
         }
     }
 }

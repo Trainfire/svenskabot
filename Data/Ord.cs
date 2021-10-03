@@ -11,10 +11,11 @@ namespace svenskabot
         public string Ordklass { get; set; }
         public string Böjningar { get; set; }
         public List<OrdDefinition> Definitioner = new List<OrdDefinition>();
+        public string SourceUrl { get; set; }
 
         public OrdEntry AsNew()
         {
-            return new OrdEntry(Grundform, Ordklass, Definitioner, Böjningar);
+            return new OrdEntry(Grundform, Ordklass, Definitioner, Böjningar, SourceUrl);
         }
     }
 
@@ -26,16 +27,16 @@ namespace svenskabot
         public string Grundform { get; private set; }
         public string Ordklass { get; private set; }
         public string Böjningar { get; private set; }
-        public IReadOnlyList<OrdDefinition> Definitioner { get { return _definitioner; } }
+        public string SourceUrl { get; private set; }
+        public IReadOnlyList<OrdDefinition> Definitioner { get; private set; }
 
-        private List<OrdDefinition> _definitioner { get; set; }
-
-        public OrdEntry(string grundform, string ordklass, List<OrdDefinition> definitioner, string böjningar)
+        public OrdEntry(string grundform, string ordklass, List<OrdDefinition> definitioner, string böjningar, string sourceUrl)
         {
             Grundform = grundform ?? string.Empty;
             Ordklass = ordklass ?? string.Empty;
             Böjningar = böjningar ?? string.Empty;
-            _definitioner = definitioner ?? new List<OrdDefinition>();
+            Definitioner = definitioner ?? new List<OrdDefinition>();
+            SourceUrl = sourceUrl ?? string.Empty;
         }
 
         public void AddToBuilder(DiscordEmbedBuilder discordEmbedBuilder)
@@ -89,6 +90,8 @@ namespace svenskabot
                 var additionalDefinitions = Definitioner.Count - maxDefinitions;
                 discordEmbedBuilder.AddField("Obs!", $"Det finns { additionalDefinitions.ToString().ToBold() } definitioner till som kan hittas online.");
             }
+
+            discordEmbedBuilder.AddFieldSafe("Källa", SourceUrl);
         }
 
         public DiscordEmbedBuilder AsEmbedBuilder()
