@@ -4,6 +4,8 @@ using DSharpPlus.Entities;
 using System;
 using System.Threading.Tasks;
 using System.Linq;
+using System.Text;
+using System.Collections.Generic;
 
 namespace svenskabot
 {
@@ -20,6 +22,80 @@ namespace svenskabot
         {
             WithColor(DiscordColor.Green);
             WithFooter($"Med kärlek från + { discordClient.CurrentUser.Username }", null);
+        }
+    }
+
+    public class StringBuilderEx
+    {
+        private StringBuilder _stringBuilder = new StringBuilder();
+
+        public StringBuilderEx Append(string value)
+        {
+            _stringBuilder.Append(value);
+            return this;
+        }
+
+        public StringBuilderEx AppendWithCondition(string value, bool condition)
+        {
+            if (condition)
+                Append(value);
+            return this;
+        }
+
+        /// <summary>
+        /// Appends '\nHeader: '
+        /// </summary>
+        public StringBuilderEx AddHeader(string header)
+        {
+            AppendLineBreak();
+            _stringBuilder.Append($"{ header }: ".ToBold());
+            return this;
+        }
+
+        /// <summary>
+        /// Adds '\nHeader: Value'
+        /// </summary>
+        public StringBuilderEx AddField(string header, string value)
+        {
+            if (!string.IsNullOrEmpty(value))
+            {
+                AddHeader(header);
+                _stringBuilder.Append(value);
+            }
+            return this;
+        }
+
+        /// <summary>
+        /// Appends '\nHeader: Value 1, Value 2, Value 3, ...' if the values array is valid.
+        /// </summary>
+        public StringBuilderEx AddField(string header, string[] values)
+        {
+            if (values.Length != 0)
+            {
+                AddHeader(header);
+                _stringBuilder.AppendJoin("; ", values);
+            }
+            return this;
+        }
+
+        /// <summary>
+        /// Appends '\nHeader: Value 1, Value 2, Value 3, ...' if the values list is valid.
+        /// </summary>
+        public StringBuilderEx AddField(string header, List<string> values)
+        {
+            AddField(header, values.ToArray());
+            return this;
+        }
+
+        public override string ToString()
+        {
+            return _stringBuilder.ToString();
+        }
+
+        private StringBuilderEx AppendLineBreak()
+        {
+            _stringBuilder.Append("\n");
+            return this;
         }
     }
 

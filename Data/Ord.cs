@@ -43,9 +43,12 @@ namespace svenskabot
         {
             int maxDefinitions = Resources.ConstantData.Ord.MaxDefinitions;
 
-            discordEmbedBuilder.AddFieldSafe("Grundform", Grundform);
-            discordEmbedBuilder.AddFieldSafe("Ordklass", Ordklass);
-            discordEmbedBuilder.AddFieldSafe("Böjningar", Böjningar);
+            var infoStringBuilder = new StringBuilderEx()
+                .AddField("Grundform", Grundform)
+                .AddField("Ordklass", Ordklass)
+                .AddField("Böjningar", Böjningar);
+
+            discordEmbedBuilder.AddField(":memo:", infoStringBuilder.ToString());
 
             int definitionCount = Math.Min(maxDefinitions, Definitioner.Count);
 
@@ -53,36 +56,25 @@ namespace svenskabot
             {
                 var definitionEntry = Definitioner[i];
 
-                string definitionString = string.Empty;
+                var definitionStringBuilder = new StringBuilderEx();
 
-                definitionString += AddHeader("Definition");
-                definitionString += definitionEntry.Definition;
-
-                if (!string.IsNullOrEmpty(definitionEntry.DefinitionT))
+                // Definition
+                if (!string.IsNullOrEmpty(definitionEntry.Definition))
                 {
-                    definitionString += $" ({ definitionEntry.DefinitionT })";
+                    definitionStringBuilder
+                        .AddField("Definition", definitionEntry.Definition)
+                        .AppendWithCondition($" ({ definitionEntry.DefinitionT })", !string.IsNullOrEmpty(definitionEntry.DefinitionT));
                 }
 
-                definitionString += AddLineBreak();
+                // Konstruction
+                definitionStringBuilder.AddField("Konstruktion", definitionEntry.Konstruktion);
 
-                if (definitionEntry.Konstruktion.Count() != 0)
-                {
-                    definitionString += AddHeader("Konstruktion");
-                    definitionString += AddList(definitionEntry.Konstruktion.ToArray());
-                    definitionString += AddLineBreak();
-                }
+                // Exempel
+                var exempel = definitionEntry.Exempel.Take(Resources.ConstantData.Ord.MaxExamplesPerDefinition).ToList();
+                definitionStringBuilder.AddField("Exempel", exempel);
 
-                var examples = definitionEntry.Exempel
-                    .Take(Resources.ConstantData.Ord.MaxExamplesPerDefinition)
-                    .ToList();
-
-                if (examples.Count() != 0)
-                {
-                    definitionString += AddHeader("Exempel");
-                    definitionString += AddList(examples.ToArray());
-                }
-
-                discordEmbedBuilder.AddField($"{ (i + 1).ToString() }", definitionString);
+                // Add to embed
+                discordEmbedBuilder.AddField($"{ (i + 1).ToString() }", definitionStringBuilder.ToString());
             }
 
             if (Definitioner.Count > maxDefinitions)
@@ -99,21 +91,6 @@ namespace svenskabot
             var outBuilder = new DiscordEmbedBuilder();
             AddToBuilder(outBuilder);
             return outBuilder;
-        }
-
-        string AddHeader(string header)
-        {
-            return $"{ header }: ".ToBold();
-        }
-
-        string AddList(string[] strings)
-        {
-            return string.Join("; ", strings);
-        }
-
-        string AddLineBreak()
-        {
-            return "\n";
         }
     }
 
