@@ -17,7 +17,6 @@
         public class ExternalSources
         {
             public string FolketsOrdbokLexicon { get; set; } = "https://folkets-lexikon.csc.kth.se/folkets/folkets_sv_en_public.xml";
-            // TODO: Add other URL resources here
         }
 
         public class ExempelMeningarConfig
@@ -27,6 +26,7 @@
 
         public class SvenskaSearcherConfig
         {
+            public string Url { get; set; } = "https://www.svenska.se";
             public int MaxEmbeds { get; set; } = 2;
         }
 

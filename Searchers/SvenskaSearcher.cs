@@ -107,12 +107,13 @@ namespace svenskabot
             }
         }
 
-        private const string _rootUrl = "http://www.svenska.se";
+        private string _rootUrl;
         private SvenskaKälla _källa;
 
         public SvenskaSearcher(SvenskaKälla källa)
         {
             _källa = källa;
+            _rootUrl = Resources.ConstantData.SvenskaSearcher.Url;
         }
 
         protected override async Task<ISearcherResult> ProcessHtmlDocument(HtmlDocument htmlDocument)
