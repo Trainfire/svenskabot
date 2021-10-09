@@ -25,7 +25,7 @@ namespace svenskabot
             embedBuilder.SetupWithDefaultValues(_discordClient);
             embedBuilder.WithTitle($"{ DiscordEmoji.FromName(_discordClient, ":date:") } Dagens ord");
 
-            if (_ordEntry == null)
+            if (_ordEntry != null)
             {
                 if (DateTime.Now.DayOfWeek == DayOfWeek.Friday)
                 {
