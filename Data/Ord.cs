@@ -39,7 +39,7 @@ namespace svenskabot
             SourceUrl = sourceUrl ?? string.Empty;
         }
 
-        public void AddToBuilder(DiscordEmbedBuilder discordEmbedBuilder)
+        public DiscordEmbedBuilder AddDataToEmbedBuilder(DiscordEmbedBuilder discordEmbedBuilder)
         {
             int maxDefinitions = Resources.ConstantData.Ord.MaxDefinitions;
 
@@ -84,12 +84,14 @@ namespace svenskabot
             }
 
             discordEmbedBuilder.AddFieldSafe("Källa", SourceUrl);
+
+            return discordEmbedBuilder;
         }
 
         public DiscordEmbedBuilder AsEmbedBuilder()
         {
             var outBuilder = new DiscordEmbedBuilder();
-            AddToBuilder(outBuilder);
+            AddDataToEmbedBuilder(outBuilder);
             return outBuilder;
         }
     }

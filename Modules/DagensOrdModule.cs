@@ -10,15 +10,47 @@ namespace svenskabot
 {
     class DagensOrdModule : BaseModule
     {
-        public OrdEntry Entry { get; private set; }
-
         private string Path { get; } = AppDomain.CurrentDomain.BaseDirectory + FileName;
         private const string FileName = "dagensord";
         private const int MinDelayBetweenSearches = 1000;
 
+        private OrdEntry _ordEntry;
         private DiscordClient _discordClient;
         private DiscordChannel _discordChannel;
         private DateTime _targetTime;
+
+        public DiscordEmbedBuilder GetDagensOrdEmbedBuilder()
+        {
+            var embedBuilder = new DiscordEmbedBuilder();
+            embedBuilder.SetupWithDefaultValues(_discordClient);
+            embedBuilder.WithTitle($"{ DiscordEmoji.FromName(_discordClient, ":date:") } Dagens ord");
+
+            if (_ordEntry == null)
+            {
+                if (DateTime.Now.DayOfWeek == DayOfWeek.Friday)
+                {
+                    try
+                    {
+                        var grodanEmoji = DiscordEmoji.FromName(_discordClient, $":{ Resources.ConstantData.DagensOrd.GrodanEmoji }:");
+                        embedBuilder.AddField(Strings.FredagMessage, grodanEmoji);
+                    }
+                    catch
+                    {
+                        LogWarning("Could not find emoji...");
+                    }
+
+                }
+
+                // Append the data in Ord to the end of this embed.
+                embedBuilder = _ordEntry.AddDataToEmbedBuilder(embedBuilder);
+            }
+            else
+            {
+                embedBuilder.AddField("Ojdå.", "Dagens ord finns inte!");
+            }
+
+            return embedBuilder;
+        }
 
         protected override void Setup(DiscordClient client)
         {
@@ -47,7 +79,7 @@ namespace svenskabot
             {
                 using (var file = File.OpenText(Path))
                 {
-                    Entry = JsonConvert.DeserializeObject<OrdEntry>(file.ReadToEnd());
+                    _ordEntry = JsonConvert.DeserializeObject<OrdEntry>(file.ReadToEnd());
                 }
 
                 Log("Loaded word from file...");
@@ -81,6 +113,10 @@ namespace svenskabot
                     }
                 });
             }
+            else
+            {
+                LogWarning($"The specified value for 'channelID' is invalid. Dagensord will not be posted!");
+            }
         }
 
         private async Task Update()
@@ -99,27 +135,7 @@ namespace svenskabot
                     {
                         Log($"Posting to channel: { _discordChannel.Name }");
 
-                        var embed = new DiscordEmbedBuilder();
-                        embed.SetupWithDefaultValues(_discordClient);
-                        embed.WithTitle($"{ DiscordEmoji.FromName(_discordClient, ":date:") } Dagens ord");
-
-                        Entry.AddToBuilder(embed);
-
-                        if (DateTime.Now.DayOfWeek == DayOfWeek.Friday)
-                        {
-                            try
-                            {
-                                var grodanEmoji = DiscordEmoji.FromName(_discordClient, $":{ Resources.ConstantData.DagensOrd.GrodanEmoji }:");
-                                embed.AddField(Strings.FredagMessage, grodanEmoji);
-                            }
-                            catch
-                            {
-                                LogWarning("Could not find emoji...");
-                            }
-
-                        }
-
-                        await _discordChannel.SendMessageAsync(embed: embed);
+                        await _discordChannel.SendMessageAsync(embed: GetDagensOrdEmbedBuilder());
                     }
 
                     UpdateTargetTime();
@@ -161,11 +177,11 @@ namespace svenskabot
 
             while (!resultFound)
             {
-                Log($"Searching on SO for: { Entry.Grundform }...");
+                Log($"Searching on SO for: { _ordEntry.Grundform }...");
 
                 var searcher = new SvenskaSearcher(SvenskaKälla.SO);
 
-                await searcher.SearchAsync(Entry.Grundform);
+                await searcher.SearchAsync(_ordEntry.Grundform);
 
                 if (searcher.LastResponse == WebscrappingSearcherResponse.WebException)
                 {
@@ -183,9 +199,9 @@ namespace svenskabot
 
                         if (convertedResult.OrdEntries != null && convertedResult.OrdEntries.Count != 0)
                         {
-                            Log($"Success! Dagensord is now: { Entry.Grundform }");
+                            Log($"Success! Dagensord is now: { _ordEntry.Grundform }");
 
-                            Entry = convertedResult.OrdEntries.First();
+                            _ordEntry = convertedResult.OrdEntries.First();
 
                             resultFound = true;
                         }
@@ -205,7 +221,7 @@ namespace svenskabot
 
             using (var sw = File.CreateText(Path))
             {
-                sw.Write(JsonConvert.SerializeObject(Entry, Formatting.Indented));
+                sw.Write(JsonConvert.SerializeObject(_ordEntry, Formatting.Indented));
             }
         }
 
@@ -215,9 +231,9 @@ namespace svenskabot
 
             var r = new Random().Next(0, ordbok.Words.Count - 1);
 
-            Entry = ordbok.Words[r];
+            _ordEntry = ordbok.Words[r];
 
-            Log($"Seeding new word from Folketsordbok... New word is: { Entry.Grundform }.");
+            Log($"Seeding new word from Folketsordbok... New word is: { _ordEntry.Grundform }.");
         }
 
         private void Log(string message, LogLevel logLevel = LogLevel.Info)
