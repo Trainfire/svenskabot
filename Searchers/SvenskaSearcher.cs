@@ -99,7 +99,7 @@ namespace svenskabot
                     case SvenskaKälla.SAOL: källaOrd = "saol"; break;
                 }
 
-                var url = $"{ _rootUrl }/{ källaOrd }/?sok={ SearchTerm }&pz=1";
+                var url = $"{ _rootUrl }/{ källaOrd }/?sok={ SearchTerm.Replace(' ', '+') }&pz=1";
 
                 return url;
             }
